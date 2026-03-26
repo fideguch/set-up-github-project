@@ -1,10 +1,137 @@
+---
+name: setup_github_project
+description: >-
+  GitHub Projects V2 の開発環境を一括構築するプレイブック。
+  14ステータスワークフロー、6ビュー、カスタムフィールド(Priority/Estimate/Sprint/Target)、
+  13ラベル、Issue/PRテンプレート、5 GitHub Actions を6フェーズで段階的にセットアップ。
+intent: >-
+  gh CLI と GraphQL API を使い、GitHub Projects V2 の開発管理環境を
+  対話的に構築する。各フェーズで完了確認を取り、API制限のある手動設定は
+  明確にガイドする。
+type: interactive
+best_for:
+  - 'New repository GitHub Projects V2 environment setup'
+  - 'Team project management infrastructure from scratch'
+  - 'Bulk creation of labels, fields, views, and workflows'
+  - 'Standardizing project setup across multiple repositories'
+triggers:
+  - 'GitHub Projectsの環境を構築したい'
+  - 'プロジェクト環境をセットアップ'
+  - '!setup_github_project'
+  - 'GitHub Projects setup'
+  - 'Project V2 setup'
+  - 'プロジェクト管理環境'
+  - 'ラベルを一括作成'
+  - 'ビューを作成したい'
+  - 'Sprint環境構築'
+  - '開発環境セットアップ'
+---
+
 # GitHub Projects 環境一括構築 プレイブック
 
-## メタデータ
+GitHub Projects V2 のベストプラクティスに基づいた開発環境を、6フェーズで段階的に構築する。
 
-- **マクロ**: `!setup_github_project`
-- **トリガー**: 「GitHub Projectsの環境を構築したい」「プロジェクト環境をセットアップ」「!setup_github_project」
-- **前提条件**: gh CLI認証済み、Classic PAT（`ghp_`）、スコープ `project,repo,read:org`
+**前提条件**: gh CLI 認証済み、Classic PAT（`ghp_`）、スコープ `project,repo,read:org`
+
+---
+
+## Help Command
+
+以下のいずれかでヘルプを表示する:
+
+- 「ヘルプ」「help」「使い方」「how to use」
+- **初回起動時**（ターゲットリポジトリ未指定の場合）にも自動表示
+
+### ヘルプ出力テンプレート
+
+```
+GitHub Projects V2 環境一括構築 — クイックガイド
+
+始め方
+  「○○リポジトリにGitHub Projects環境を構築したい」と伝えるだけでOK！
+  対話形式で6フェーズを進め、開発管理環境を一括構築します。
+
+構築される環境
+  - 14段階ステータス (Icebox → Done)
+  - 6ビュー (Issues, Product Backlog, Sprint Board, Sprint Table, Roadmap, My Items)
+  - カスタムフィールド (Priority P0-P4, Sprint, Estimate, Target)
+  - 13ラベル (Type 6 + Area 4 + Ops 3)
+  - Issue/PR テンプレート
+  - 5 GitHub Actions ワークフロー
+
+6フェーズ
+  Phase 1: カスタムフィールド作成  → Priority, Estimate, Target, Status, Sprint
+  Phase 2: ラベル一括作成          → 13ラベルをスクリプトで一括作成
+  Phase 3: ビュー作成              → 5ビュー + 表示フィールド設定ガイド
+  Phase 4: テンプレート配置        → Issue/PR テンプレートをコミット
+  Phase 5: 自動化設定              → Built-in Workflows + GitHub Actions
+  Phase 6: ドキュメント・最終確認  → 14項目チェックリスト
+
+前提条件
+  - gh CLI インストール済み & 認証済み
+  - Classic PAT (ghp_) with scopes: project, repo, read:org
+  - Fine-grained PAT は Projects V2 GraphQL API 非対応
+
+連携スキル
+  /code-quality              → ESLint + Prettier + Husky 導入
+  /ci-cd-pipeline            → GitHub Actions CI/CD パイプライン構築
+  /typescript-best-practices → TypeScript 初期設定
+  /git-workflow              → ブランチ戦略 + Conventional Commits
+
+コマンド例
+  「fideguch/my-repo にGitHub Projects環境を構築して」
+  「ラベルだけ一括作成して」
+  「既存のプロジェクトに足りないビューを追加して」
+  「ヘルプ」
+```
+
+---
+
+## Progress Detection (途中再開)
+
+スキル起動時にターゲットリポジトリの状態を自動チェックし、完了済みフェーズをスキップする。
+
+### 進捗判定ロジック
+
+```bash
+# Phase 1 判定: カスタムフィールドの存在確認
+gh project field-list <NUMBER> --owner "<OWNER>" --format json
+# → Priority, Estimate, Target が存在すれば Phase 1 完了
+
+# Phase 2 判定: ラベルの存在確認
+gh label list --repo <OWNER/REPO> --json name --jq '.[].name'
+# → 13ラベルすべて存在すれば Phase 2 完了
+
+# Phase 3 判定: ビューの存在確認
+gh project view-list <NUMBER> --owner "<OWNER>"
+# → Product Backlog, Sprint Board, Sprint Table, Roadmap, My Items が存在すれば Phase 3 完了
+
+# Phase 4 判定: テンプレートの存在確認
+# .github/ISSUE_TEMPLATE/ と .github/pull_request_template.md の存在を確認
+gh api repos/<OWNER/REPO>/contents/.github/ISSUE_TEMPLATE --jq '.[].name' 2>/dev/null
+# → bug_report.yml, feature_request.yml 存在すれば Phase 4 完了
+
+# Phase 5 判定: ワークフローの存在確認
+gh api repos/<OWNER/REPO>/contents/.github/workflows --jq '.[].name' 2>/dev/null
+# → ci.yml 等のワークフローが存在すれば Phase 5 完了
+```
+
+### 進捗表示
+
+```
+現在の進捗: Phase 2 完了（13ラベル作成済み、カスタムフィールド3種設定済み）
+  → 次は Phase 3: ビュー作成 です
+```
+
+### 途中再開時の動作
+
+1. ターゲットリポジトリとプロジェクト番号を確認
+2. 上記の進捗判定を実行
+3. 完了済みフェーズを表示
+4. 「この状態で続けますか？最初からやり直す場合は教えてください。」と確認
+5. 該当フェーズから再開
+
+---
 
 ## 実行フロー
 

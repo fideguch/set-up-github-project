@@ -26,9 +26,13 @@ test.describe('File Structure Validation', () => {
   const requiredRootFiles = [
     'SKILL.md',
     'README.md',
+    'README.en.md',
     'CONTRIBUTING.md',
     'CLAUDE.md',
     'LICENSE',
+    'SECURITY.md',
+    'CHANGELOG.md',
+    'install.sh',
     '.gitignore',
     'package.json',
     'tsconfig.json',
@@ -146,8 +150,8 @@ test.describe('SKILL.md Content Validation', () => {
     expect(content).toContain('!setup_github_project');
   });
 
-  test('has metadata section with triggers', () => {
-    expect(content).toContain('トリガー');
+  test('has triggers in frontmatter', () => {
+    expect(content).toContain('triggers:');
   });
 
   test('has metadata section with prerequisites', () => {
@@ -1029,5 +1033,94 @@ test.describe('.github/ Templates for This Repo', () => {
     // They may be similar but .github/ should reference this repo's context
     expect(ghBug).toContain('name:');
     expect(tplBug).toContain('name:');
+  });
+});
+
+// ============================================================
+// 11. Skill Maturity Validation (v1.3.0)
+// ============================================================
+test.describe('Skill Maturity Validation', () => {
+  test('SKILL.md has YAML frontmatter with triggers', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toMatch(/^---\n/);
+    expect(content).toContain('triggers:');
+  });
+
+  test('SKILL.md frontmatter has 10+ trigger keywords', () => {
+    const content = readFile('SKILL.md');
+    const frontmatter = content.split('---')[1] || '';
+    const triggerLines = frontmatter.split('\n').filter((l) => l.trim().startsWith("- '"));
+    expect(triggerLines.length).toBeGreaterThanOrEqual(10);
+  });
+
+  test('SKILL.md has name and description in frontmatter', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('name:');
+    expect(content).toContain('description:');
+  });
+
+  test('SKILL.md has Help Command section', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('## Help Command');
+  });
+
+  test('SKILL.md help section mentions connected skills', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('/code-quality');
+    expect(content).toContain('/ci-cd-pipeline');
+  });
+
+  test('SKILL.md has Progress Detection section', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Progress Detection');
+  });
+
+  test('SKILL.md progress detection has gh CLI commands', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('gh label list');
+    expect(content).toContain('gh project field-list');
+  });
+
+  test('install.sh exists and is executable', () => {
+    expect(fileExists('install.sh')).toBe(true);
+    const content = readFile('install.sh');
+    expect(content.startsWith('#!/bin/bash')).toBe(true);
+    expect(content).toContain('set -euo pipefail');
+  });
+
+  test('install.sh targets ~/.claude/skills/', () => {
+    const content = readFile('install.sh');
+    expect(content).toContain('.claude/skills');
+  });
+
+  test('SECURITY.md covers PROJECT_TOKEN handling', () => {
+    const content = readFile('SECURITY.md');
+    expect(content).toContain('PROJECT_TOKEN');
+    expect(content).toContain('Classic PAT');
+  });
+
+  test('CHANGELOG.md has version entries', () => {
+    const content = readFile('CHANGELOG.md');
+    expect(content).toContain('[1.0.0]');
+    expect(content).toContain('[1.1.0]');
+    expect(content).toContain('[1.2.0]');
+    expect(content).toContain('[1.3.0]');
+  });
+
+  test('README.en.md exists with English content', () => {
+    const content = readFile('README.en.md');
+    expect(content).toContain('# Set Up GitHub Project');
+    expect(content).toContain('Prerequisites');
+    expect(content).toContain('Installation');
+  });
+
+  test('README.md links to English version', () => {
+    const content = readFile('README.md');
+    expect(content).toContain('[English](README.en.md)');
+  });
+
+  test('README.md mentions install.sh', () => {
+    const content = readFile('README.md');
+    expect(content).toContain('install.sh');
   });
 });

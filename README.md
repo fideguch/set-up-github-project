@@ -1,5 +1,7 @@
 # Set Up GitHub Project
 
+[English](README.en.md)
+
 GitHub Projects V2 の開発環境を一括構築する Devin プレイブック＆スキル集。
 
 14ステータスワークフロー、5ビュー構成、カスタムフィールド、ラベル13種、Issueテンプレート、PR テンプレート、GitHub Actions 自動化を一括セットアップします。
@@ -30,6 +32,14 @@ GitHub Projects V2 の開発環境を一括構築する Devin プレイブック
 ### Devin プレイブックとして使用
 
 Devin で `!setup_github_project` マクロを実行すると、プレイブックが起動し対話的に環境構築を進めます。
+
+### インストール
+
+```bash
+git clone git@github.com:fideguch/set-up-github-project.git
+cd set-up-github-project
+./install.sh    # ~/.claude/skills/ にスキルをインストール
+```
 
 ### スクリプトで直接実行
 
