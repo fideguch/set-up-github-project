@@ -13,7 +13,7 @@ GitHub Projects V2 の開発環境を一括構築する Devin プレイブック
 | 要素 | 内容 |
 |------|------|
 | **ステータス** | 14段階（Icebox → Planning → Design → Dev → Release → Done） |
-| **ビュー** | 5種（Product Backlog, Sprint Board, Sprint Table, Roadmap, My Items） |
+| **ビュー** | 6種（Issues, Product Backlog, Sprint Board, Sprint Table, Roadmap, My Items） |
 | **カスタムフィールド** | Priority (P0-P4), Sprint (1w Iteration), Estimate (Number), Target (Text) |
 | **ラベル** | 13種（Type 6 + Area 4 + Ops 3） |
 | **テンプレート** | Issue (feature/bug) + PR テンプレート |

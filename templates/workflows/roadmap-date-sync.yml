@@ -17,12 +17,11 @@ on:
 
 env:
   PROJECT_ID: '__PROJECT_ID__'
-  PROJECT_NUMBER: __PROJECT_NUMBER__
+  PROJECT_NUMBER: '__PROJECT_NUMBER__'
   OWNER: '__OWNER__'
 
 jobs:
   sync-roadmap-dates:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || secrets.PROJECT_TOKEN != '' }}
     runs-on: ubuntu-latest
     permissions:
       issues: read
