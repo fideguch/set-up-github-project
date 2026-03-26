@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Maintain and extend the `set-up-github-project` skill.
-One-command GitHub Projects V2 environment setup: 14-status workflow, 6 views,
-custom fields, 13 labels, Issue/PR templates, and 5 GitHub Actions workflows.
+Maintain and extend the `github_project_manager` skill (formerly set-up-github-project).
+PM assistant for GitHub Projects V2: environment setup, daily operations
+(Issue/PR/status management), Sprint analytics, and migration from Jira/Linear/Notion.
 
 ## Language Rules
 

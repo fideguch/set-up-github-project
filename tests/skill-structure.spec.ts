@@ -150,7 +150,7 @@ test.describe('SKILL.md Content Validation', () => {
   });
 
   test('has metadata section with macro', () => {
-    expect(content).toContain('!setup_github_project');
+    expect(content).toContain('!github_project_manager');
   });
 
   test('has triggers in frontmatter', () => {
@@ -181,14 +181,14 @@ test.describe('SKILL.md Content Validation', () => {
     expect(content).toContain('テンプレート');
   });
 
-  test('contains Phase 5: Automation', () => {
-    expect(content).toContain('Phase 5');
-    expect(content).toContain('自動化');
+  test('contains Phase 4-5: Templates and Workflows', () => {
+    expect(content).toContain('Phase 4-5');
+    expect(content).toContain('テンプレート');
   });
 
-  test('contains Phase 6: Documentation', () => {
+  test('contains Phase 6: Checklist', () => {
     expect(content).toContain('Phase 6');
-    expect(content).toContain('ドキュメント');
+    expect(content).toContain('チェックリスト');
   });
 
   test('references 14 statuses', () => {
@@ -242,17 +242,16 @@ test.describe('SKILL.md Content Validation', () => {
     expect(content).toContain('Iteration');
   });
 
-  test('references 5 workflow files in Phase 5', () => {
-    expect(content).toContain('ci.yml');
-    expect(content).toContain('project-automation.yml');
-    expect(content).toContain('pr-labeler.yml');
-    expect(content).toContain('stale-detection.yml');
-    expect(content).toContain('roadmap-date-sync.yml');
+  test('references script names in script reference table', () => {
+    expect(content).toContain('setup-all.sh');
+    expect(content).toContain('project-ops.sh');
+    expect(content).toContain('migrate-import.sh');
+    expect(content).toContain('sprint-report.sh');
   });
 
-  test('has completion checklist items', () => {
-    const checklistCount = (content.match(/- \[ \]/g) || []).length;
-    expect(checklistCount).toBeGreaterThanOrEqual(10);
+  test('has checklist items in Phase 6', () => {
+    expect(content).toContain('チェックリスト');
+    expect(content).toContain('14ステータス');
   });
 
   test('references setup-labels.sh script', () => {
@@ -885,13 +884,8 @@ test.describe('Sync Rule Validation', () => {
     expect(readme).toContain('6種');
   });
 
-  test('workflow count is consistent across docs', () => {
-    const readme = readFile('README.md');
-    const skill = readFile('SKILL.md');
+  test('workflow count is consistent in automation guide', () => {
     const guide = readFile('docs/automation-guide.md');
-    // All should reference 5 GitHub Actions
-    expect(readme).toContain('GitHub Actions 5');
-    expect(skill).toContain('5ファイル');
     expect(guide).toContain('5つ');
   });
 
@@ -1053,7 +1047,7 @@ test.describe('Skill Maturity Validation', () => {
     const content = readFile('SKILL.md');
     const frontmatter = content.split('---')[1] || '';
     const triggerLines = frontmatter.split('\n').filter((l) => l.trim().startsWith("- '"));
-    expect(triggerLines.length).toBeGreaterThanOrEqual(10);
+    expect(triggerLines.length).toBeGreaterThanOrEqual(15);
   });
 
   test('SKILL.md has name and description in frontmatter', () => {
@@ -1073,9 +1067,9 @@ test.describe('Skill Maturity Validation', () => {
     expect(content).toContain('/ci-cd-pipeline');
   });
 
-  test('SKILL.md has Progress Detection section', () => {
+  test('SKILL.md has Onboarding section with project detection', () => {
     const content = readFile('SKILL.md');
-    expect(content).toContain('Progress Detection');
+    expect(content).toContain('Onboarding');
   });
 
   test('SKILL.md progress detection has gh CLI commands', () => {
@@ -1112,7 +1106,7 @@ test.describe('Skill Maturity Validation', () => {
 
   test('README.en.md exists with English content', () => {
     const content = readFile('README.en.md');
-    expect(content).toContain('# Set Up GitHub Project');
+    expect(content).toContain('# GitHub Project Manager');
     expect(content).toContain('Prerequisites');
     expect(content).toContain('Installation');
   });
@@ -1222,7 +1216,7 @@ test.describe('Automation & Operations Validation', () => {
 
   test('SKILL.md has operations command section', () => {
     const content = readFile('SKILL.md');
-    expect(content).toContain('運用コマンド');
+    expect(content).toContain('日常運用');
     expect(content).toContain('project-ops.sh');
   });
 
@@ -1354,5 +1348,94 @@ test.describe('Migration & Reporting Validation', () => {
     expect(content).toContain('[1.5.0]');
     expect(content).toContain('migrate-import.sh');
     expect(content).toContain('sprint-report.sh');
+  });
+});
+
+// ============================================================
+// 14. PM Assistant Redesign Validation (v2.0.0)
+// ============================================================
+test.describe('PM Assistant Redesign Validation', () => {
+  test('SKILL.md name is github_project_manager', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('name: github_project_manager');
+  });
+
+  test('SKILL.md has Onboarding section with config.json', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Onboarding');
+    expect(content).toContain('.github-project-config.json');
+  });
+
+  test('SKILL.md has Mode A: Setup', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Mode A');
+    expect(content).toMatch(/環境構築|Setup/);
+  });
+
+  test('SKILL.md has Mode B: Operations as main mode', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Mode B');
+    expect(content).toContain('日常運用');
+    expect(content).toContain('メイン');
+  });
+
+  test('SKILL.md has Mode C: Analytics', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Mode C');
+    expect(content).toMatch(/分析|Analytics/);
+  });
+
+  test('SKILL.md has dialog patterns for Issue creation', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('Issue にして');
+    expect(content).toContain('gh issue create');
+  });
+
+  test('SKILL.md has dialog patterns for PR creation', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('PR を作って');
+    expect(content).toContain('gh pr create');
+  });
+
+  test('SKILL.md has dialog patterns for status change', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('開発中にして');
+  });
+
+  test('README.md title is GitHub Project Manager', () => {
+    const content = readFile('README.md');
+    expect(content).toContain('# GitHub Project Manager');
+  });
+
+  test('README.en.md title is GitHub Project Manager', () => {
+    const content = readFile('README.en.md');
+    expect(content).toContain('# GitHub Project Manager');
+  });
+
+  test('USAGE.md has daily operations section before views section', () => {
+    const content = readFile('docs/USAGE.md');
+    const dailyOpsIndex = content.indexOf('## 日常運用');
+    const viewsIndex = content.indexOf('## ビューの使い方');
+    // Daily operations should appear before views section
+    expect(dailyOpsIndex).toBeGreaterThan(-1);
+    expect(viewsIndex).toBeGreaterThan(-1);
+    expect(dailyOpsIndex).toBeLessThan(viewsIndex);
+  });
+
+  test('USAGE.md has onboarding section', () => {
+    const content = readFile('docs/USAGE.md');
+    expect(content).toContain('オンボーディング');
+    expect(content).toContain('.github-project-config.json');
+  });
+
+  test('CHANGELOG.md has v2.0.0 entry', () => {
+    const content = readFile('CHANGELOG.md');
+    expect(content).toContain('[2.0.0]');
+    expect(content).toContain('github_project_manager');
+  });
+
+  test('install.sh uses new skill directory name', () => {
+    const content = readFile('install.sh');
+    expect(content).toContain('github-project-manager');
   });
 });

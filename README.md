@@ -1,10 +1,10 @@
-# Set Up GitHub Project
+# GitHub Project Manager
 
 [English](README.en.md)
 
-GitHub Projects V2 の開発環境を一括構築する Devin プレイブック＆スキル集。
+GitHub Projects V2 のPM支援スキル。環境構築・日常運用・Sprint分析・移行を統合サポート。
 
-14ステータスワークフロー、5ビュー構成、カスタムフィールド、ラベル13種、Issueテンプレート、PR テンプレート、GitHub Actions 自動化を一括セットアップします。
+「Issue作って」「ステータス変えて」「Sprintレポート出して」— PMの日常操作をCLIで即実行。新規プロジェクトの一括構築からJira/Linearからの移行まで対応。
 
 ## 概要
 

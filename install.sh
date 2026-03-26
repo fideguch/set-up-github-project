@@ -2,7 +2,7 @@
 # install.sh — Install set-up-github-project skill to ~/.claude/skills/
 set -euo pipefail
 
-SKILL_NAME="set-up-github-project"
+SKILL_NAME="github-project-manager"
 SKILL_DIR="${HOME}/.claude/skills/${SKILL_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

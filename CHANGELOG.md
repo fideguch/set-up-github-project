@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-03-27
+
+### Changed
+
+- **BREAKING**: Rebranded from `setup_github_project` to `github_project_manager`
+- SKILL.md completely redesigned with 3-mode architecture (Setup / Operations / Analytics)
+- Added Onboarding flow with `.github-project-config.json` for project context persistence
+- Added Mode B: Daily Operations as the primary mode (Issue creation, PR support, status changes, backlog/blocker queries)
+- Added Mode C: Analytics (Sprint reports, velocity tracking)
+- Added natural language dialog patterns for PM daily tasks
+- Triggers expanded from 10 to 15 (daily operation keywords like "Issue を作成して", "ステータスを変更")
+- docs/USAGE.md restructured: daily operations first, setup second
+- README rebranded to "GitHub Project Manager"
+- install.sh updated to use new skill directory name
+
 ## [1.5.0] - 2026-03-27
 
 ### Added

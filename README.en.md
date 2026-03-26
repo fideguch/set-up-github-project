@@ -1,10 +1,10 @@
-# Set Up GitHub Project
+# GitHub Project Manager
 
 [日本語](README.md)
 
-A Devin playbook and skill collection for building GitHub Projects V2 development environments in one go.
+A PM assistant skill for GitHub Projects V2. Covers environment setup, daily operations, Sprint analytics, and migration — all in one.
 
-Sets up a 14-status workflow, 6 views, custom fields, 13 labels, Issue/PR templates, and GitHub Actions automation.
+"Create an issue", "Change status", "Sprint report" — execute PM daily tasks instantly via CLI. From full project setup to Jira/Linear migration.
 
 ## Overview
 
