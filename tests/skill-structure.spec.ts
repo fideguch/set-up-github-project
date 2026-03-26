@@ -62,7 +62,10 @@ test.describe('File Structure Validation', () => {
     'scripts/setup-all.sh',
     'scripts/setup-labels.sh',
     'scripts/setup-fields.sh',
+    'scripts/setup-status.sh',
     'scripts/setup-views.sh',
+    'scripts/setup-templates.sh',
+    'scripts/project-ops.sh',
   ];
 
   for (const file of requiredScripts) {
@@ -1122,5 +1125,129 @@ test.describe('Skill Maturity Validation', () => {
   test('README.md mentions install.sh', () => {
     const content = readFile('README.md');
     expect(content).toContain('install.sh');
+  });
+});
+
+// ============================================================
+// 12. Automation & Operations Validation (v1.4.0)
+// ============================================================
+test.describe('Automation & Operations Validation', () => {
+  test('project-ops.sh has all required commands', () => {
+    const content = readFile('scripts/project-ops.sh');
+    expect(content).toContain('add-issue');
+    expect(content).toContain('add-pr');
+    expect(content).toContain('move');
+    expect(content).toContain('set-priority');
+    expect(content).toContain('list-items');
+    expect(content).toContain('list-fields');
+  });
+
+  test('project-ops.sh uses GraphQL mutations', () => {
+    const content = readFile('scripts/project-ops.sh');
+    expect(content).toContain('addProjectV2ItemById');
+    expect(content).toContain('updateProjectV2ItemFieldValue');
+  });
+
+  test('setup-templates.sh clones repo and copies templates', () => {
+    const content = readFile('scripts/setup-templates.sh');
+    expect(content).toContain('gh repo clone');
+    expect(content).toContain('.github/ISSUE_TEMPLATE');
+    expect(content).toContain('.github/workflows');
+    expect(content).toContain('git commit');
+    expect(content).toContain('git push');
+  });
+
+  test('setup-templates.sh substitutes placeholders', () => {
+    const content = readFile('scripts/setup-templates.sh');
+    expect(content).toContain('__PROJECT_ID__');
+    expect(content).toContain('__OWNER__');
+    expect(content).toContain('sed');
+  });
+
+  test('setup-status.sh defines all 14 statuses', () => {
+    const content = readFile('scripts/setup-status.sh');
+    const statuses = [
+      'Icebox',
+      '進行待ち',
+      '要件作成中',
+      'デザイン待ち',
+      'デザイン作成中',
+      'アサイン待ち',
+      '開発待ち',
+      '開発中',
+      'コードレビュー',
+      'テスト中',
+      'テスト落ち',
+      'リリース待ち',
+      'リリース済み',
+      'Done',
+    ];
+    for (const status of statuses) {
+      expect(content).toContain(status);
+    }
+  });
+
+  test('setup-status.sh has manual fallback guide', () => {
+    const content = readFile('scripts/setup-status.sh');
+    expect(content).toContain('手動設定');
+  });
+
+  test('setup-all.sh calls setup-templates.sh', () => {
+    const content = readFile('scripts/setup-all.sh');
+    expect(content).toContain('setup-templates.sh');
+  });
+
+  test('setup-all.sh calls setup-status.sh', () => {
+    const content = readFile('scripts/setup-all.sh');
+    expect(content).toContain('setup-status.sh');
+  });
+
+  test('project-automation.yml has no TODO comments', () => {
+    const content = readFile('templates/workflows/project-automation.yml');
+    expect(content).not.toContain('// TODO');
+  });
+
+  test('project-automation.yml uses GraphQL mutations', () => {
+    const content = readFile('templates/workflows/project-automation.yml');
+    expect(content).toContain('addProjectV2ItemById');
+    expect(content).toContain('updateProjectV2ItemFieldValue');
+  });
+
+  test('project-automation.yml handles all 3 status transitions', () => {
+    const content = readFile('templates/workflows/project-automation.yml');
+    expect(content).toContain('コードレビュー');
+    expect(content).toContain('テスト中');
+    expect(content).toContain('Done');
+  });
+
+  test('SKILL.md has operations command section', () => {
+    const content = readFile('SKILL.md');
+    expect(content).toContain('運用コマンド');
+    expect(content).toContain('project-ops.sh');
+  });
+
+  test('USAGE.md has project item operations section', () => {
+    const content = readFile('docs/USAGE.md');
+    expect(content).toContain('project-ops.sh');
+    expect(content).toContain('add-issue');
+    expect(content).toContain('move');
+  });
+
+  test('automation-guide.md references project-ops.sh', () => {
+    const content = readFile('docs/automation-guide.md');
+    expect(content).toContain('project-ops.sh');
+  });
+
+  test('README.md file tree includes new scripts', () => {
+    const content = readFile('README.md');
+    expect(content).toContain('setup-templates.sh');
+    expect(content).toContain('setup-status.sh');
+    expect(content).toContain('project-ops.sh');
+  });
+
+  test('CHANGELOG.md has v1.4.0 entry', () => {
+    const content = readFile('CHANGELOG.md');
+    expect(content).toContain('[1.4.0]');
+    expect(content).toContain('project-ops.sh');
   });
 });

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-03-27
+
+### Added
+
+- `scripts/setup-templates.sh` — automated template and workflow deployment to target repos (clone → copy → substitute placeholders → commit → push)
+- `scripts/setup-status.sh` — automated Status 14 options configuration via GraphQL API with manual fallback
+- `scripts/project-ops.sh` — project operations CLI (add-issue, add-pr, move, set-priority, list-items, list-fields)
+- Project item operations section in docs/USAGE.md
+- GraphQL implementation details in docs/automation-guide.md
+- Operations commands section in SKILL.md
+
+### Changed
+
+- `scripts/setup-all.sh` — fully automated (Phase 4-5 now auto-deploy templates and workflows)
+- `templates/workflows/project-automation.yml` — replaced TODO comments with real GraphQL mutations for status transitions (PR→コードレビュー, Review→テスト中, Merge→Done)
+
 ## [1.3.0] - 2026-03-27
 
 ### Added

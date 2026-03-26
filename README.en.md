@@ -44,11 +44,30 @@ Run the `!setup_github_project` macro in Devin to start the interactive setup.
 ### Direct Script Execution
 
 ```bash
-# Bulk create 13 labels
-./scripts/setup-labels.sh <OWNER/REPO>
-
-# Full environment setup (interactive)
+# Full environment setup (automated)
 ./scripts/setup-all.sh <OWNER/REPO> <PROJECT_NUMBER>
+
+# Or run individual phases
+./scripts/setup-labels.sh <OWNER/REPO>          # 13 labels
+./scripts/setup-fields.sh <OWNER> <NUMBER>       # Custom fields
+./scripts/setup-status.sh <OWNER> <NUMBER>       # 14 status options
+./scripts/setup-views.sh <OWNER> <NUMBER>        # 5 views
+./scripts/setup-templates.sh <OWNER/REPO> <NUM>  # Templates + workflows
+```
+
+### Project Operations (Post-Setup)
+
+```bash
+# Add issues/PRs to project
+./scripts/project-ops.sh <OWNER> <NUMBER> add-issue <REPO> <ISSUE_NUM>
+./scripts/project-ops.sh <OWNER> <NUMBER> add-pr <REPO> <PR_NUM>
+
+# Move cards (change status)
+./scripts/project-ops.sh <OWNER> <NUMBER> move <ITEM_ID> "開発中"
+
+# List items and fields
+./scripts/project-ops.sh <OWNER> <NUMBER> list-items
+./scripts/project-ops.sh <OWNER> <NUMBER> list-fields
 ```
 
 ## Developer Setup

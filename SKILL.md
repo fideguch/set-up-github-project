@@ -414,3 +414,50 @@ Project Settings → Workflows で以下を有効化:
 | 12  | Issue テンプレートが存在する            |      |
 | 13  | PR テンプレートが存在する               |      |
 | 14  | Built-in Workflows が有効               |      |
+
+---
+
+## 運用コマンド（セットアップ後）
+
+環境構築完了後、日常のプロジェクト運用で使用するコマンド:
+
+### Issue/PR をプロジェクトに追加
+
+```bash
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> add-issue <REPO> <ISSUE_NUMBER>
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> add-pr <REPO> <PR_NUMBER>
+```
+
+### ステータス変更（カード移動）
+
+```bash
+# アイテムIDを確認
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> list-items
+
+# ステータスを変更
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> move <ITEM_ID> "開発中"
+```
+
+### Priority 設定
+
+```bash
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> set-priority <ITEM_ID> P0
+```
+
+### フィールドID確認
+
+```bash
+./scripts/project-ops.sh <OWNER> <PROJECT_NUMBER> list-fields
+```
+
+### 自動ステータス遷移（project-automation.yml）
+
+PR 操作に連動して関連 Issue のステータスが自動変更される:
+
+| イベント     | ステータス変更   | 条件                        |
+| ------------ | ---------------- | --------------------------- |
+| PR 作成      | → コードレビュー | PR 本文に `closes #XX` 記載 |
+| レビュー承認 | → テスト中       | 同上                        |
+| PR マージ    | → Done           | 同上                        |
+
+**前提**: `PROJECT_TOKEN` シークレットと `STATUS_FIELD_ID` 環境変数が設定済みであること。

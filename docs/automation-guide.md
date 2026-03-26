@@ -37,15 +37,36 @@ PR作成/更新 → lint → typecheck → test → build
 
 ### 2. Project Automation (`project-automation.yml`)
 
-PR と Issue のステータスを自動連動。
+PR と Issue のステータスを GraphQL API で自動連動。PR 本文に `closes #XX` 形式で Issue 番号を記載すると、PR のライフサイクルに応じて関連 Issue のステータスが自動変更される。
 
-| イベント     | アクション                        |
-| ------------ | --------------------------------- |
-| PR 作成      | 関連 Issue を「コードレビュー」へ |
-| レビュー承認 | 関連 Issue を「テスト中」へ       |
-| PR マージ    | 関連 Issue を「Done」へ           |
+| イベント     | アクション                        | GraphQL Mutation                |
+| ------------ | --------------------------------- | ------------------------------- |
+| PR 作成      | 関連 Issue を「コードレビュー」へ | `updateProjectV2ItemFieldValue` |
+| レビュー承認 | 関連 Issue を「テスト中」へ       | `updateProjectV2ItemFieldValue` |
+| PR マージ    | 関連 Issue を「Done」へ           | `updateProjectV2ItemFieldValue` |
 
-**前提**: `PROJECT_TOKEN` シークレットに Classic PAT を設定
+**前提**:
+
+- `PROJECT_TOKEN` シークレットに Classic PAT を設定
+- `PROJECT_ID` 環境変数にプロジェクトの Node ID を設定（`setup-templates.sh` で自動置換）
+- `STATUS_FIELD_ID` 環境変数に Status フィールド ID を設定（`project-ops.sh list-fields` で確認）
+
+### 運用スクリプト (`project-ops.sh`)
+
+コマンドラインから直接プロジェクトアイテムを操作するスクリプト。`actions/add-to-project` (681★) と同等の機能を CLI で提供。
+
+```bash
+# Issue/PR をプロジェクトに追加
+./scripts/project-ops.sh <OWNER> <NUMBER> add-issue <REPO> <ISSUE_NUMBER>
+./scripts/project-ops.sh <OWNER> <NUMBER> add-pr <REPO> <PR_NUMBER>
+
+# ステータス変更（カード移動）
+./scripts/project-ops.sh <OWNER> <NUMBER> move <ITEM_ID> "開発中"
+
+# アイテム一覧・フィールドID確認
+./scripts/project-ops.sh <OWNER> <NUMBER> list-items
+./scripts/project-ops.sh <OWNER> <NUMBER> list-fields
+```
 
 ### 3. PR Labeler (`pr-labeler.yml`)
 

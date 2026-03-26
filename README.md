@@ -85,10 +85,13 @@ set-up-github-project/
 ├── eslint.config.mjs                  # ESLint 設定
 ├── .prettierrc                        # Prettier 設定
 ├── scripts/
+│   ├── setup-all.sh                   # 全環境一括構築（フルオート）
 │   ├── setup-labels.sh                # ラベル13種一括作成
 │   ├── setup-fields.sh                # カスタムフィールド作成
+│   ├── setup-status.sh                # Status 14オプション設定
 │   ├── setup-views.sh                 # 5ビュー作成
-│   └── setup-all.sh                   # 全環境一括構築
+│   ├── setup-templates.sh             # テンプレート＆ワークフロー自動配置
+│   └── project-ops.sh                 # プロジェクト運用操作（Issue/PR追加・カード移動）
 ├── skills/
 │   ├── code-quality/SKILL.md          # ESLint + Prettier + Husky + lint-staged 導入
 │   ├── ci-cd-pipeline/SKILL.md        # GitHub Actions CI/CD 品質パイプライン構築
