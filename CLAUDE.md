@@ -80,6 +80,6 @@ shellcheck scripts/*.sh           # Validate shell scripts
 
 ## GitHub
 
-- Remote: `git@github.com:fideguch/set-up-github-project.git`
+- Remote: `git@github.com:fideguch/my_pm_tools.git`
 - Default branch: main
 - Default account: fideguch

@@ -1,5 +1,5 @@
 #!/bin/bash
-# install.sh — Install set-up-github-project skill to ~/.claude/skills/
+# install.sh — Install github-project-manager skill to ~/.claude/skills/
 set -euo pipefail
 
 SKILL_NAME="github-project-manager"
@@ -54,4 +54,4 @@ echo "Skill installed to: $SKILL_DIR"
 echo ""
 echo "Usage:"
 echo "  Tell Claude: \"GitHub Projectsの環境を構築したい\""
-echo "  Or use macro: !setup_github_project"
+echo "  Or use macro: !github_project_manager"

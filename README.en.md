@@ -25,8 +25,8 @@ On first launch, the skill auto-detects project state: unconfigured → Mode A, 
 ## Installation
 
 ```bash
-git clone git@github.com:fideguch/set-up-github-project.git
-cd set-up-github-project
+git clone git@github.com:fideguch/my_pm_tools.git
+cd my_pm_tools
 ./install.sh    # Installs to ~/.claude/skills/github-project-manager/
 ```
 

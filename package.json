@@ -1,5 +1,5 @@
 {
-  "name": "set-up-github-project",
+  "name": "my-pm-tools",
   "version": "1.0.0",
   "description": "GitHub Projects V2 の開発環境を一括構築する Devin プレイブック＆スキル集",
   "scripts": {

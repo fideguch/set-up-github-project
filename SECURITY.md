@@ -5,7 +5,7 @@
 If you discover a security vulnerability in this project, please report it responsibly:
 
 1. **Do NOT open a public issue**
-2. Use [GitHub Security Advisories](https://github.com/fideguch/set-up-github-project/security/advisories/new) to report privately
+2. Use [GitHub Security Advisories](https://github.com/fideguch/my_pm_tools/security/advisories/new) to report privately
 3. Include: description, reproduction steps, and potential impact
 
 We will respond within 3 business days.

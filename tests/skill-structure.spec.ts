@@ -758,7 +758,7 @@ test.describe('Documentation Consistency', () => {
   test('CLAUDE.md references GitHub remote', () => {
     const content = readFile('CLAUDE.md');
     expect(content).toContain('github.com');
-    expect(content).toContain('set-up-github-project');
+    expect(content).toContain('my_pm_tools');
   });
 
   test('README references CONTRIBUTING.md', () => {
