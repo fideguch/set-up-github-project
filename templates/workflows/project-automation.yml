@@ -1,0 +1,47 @@
+name: Project Automation
+on:
+  pull_request:
+    types: [opened, closed]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  update-project:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: PR作成時 → 関連Issueを「コードレビュー」へ
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const issueMatch = body.match(/(?:closes|fixes|resolves)\s+#(\d+)/i);
+            if (issueMatch) {
+              console.log(`Related issue: #${issueMatch[1]}`);
+              // TODO: GraphQL APIでIssueステータスを「コードレビュー」に変更
+              // PROJECT_IDとFIELD_IDは環境に合わせて設定
+            } else {
+              console.log('No related issue found in PR body');
+            }
+
+      - name: レビュー承認時 → 関連Issueを「テスト中」へ
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            console.log('Review approved - moving related issue to テスト中');
+            // TODO: GraphQL APIでIssueステータスを「テスト中」に変更
+
+      - name: PRマージ時 → 関連Issueを「Done」へ
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            console.log('PR merged - moving related issue to Done');
+            // Built-in Workflowでも対応可能だが、カスタムロジックが必要な場合はここに追加
