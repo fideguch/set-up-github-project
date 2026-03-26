@@ -160,21 +160,36 @@ gh api graphql -f query='mutation($pid: ID!) { createProjectV2View(input: { proj
 gh api graphql -f query='mutation($pid: ID!) { createProjectV2View(input: { projectId: $pid, name: "My Items", layout: TABLE_LAYOUT }) { projectV2View { id name } } }' -f pid="$PROJECT_ID"
 ```
 
-### 3.3 ビューのフィルタ・ソート設定
-ビュー作成後、GitHub UI で以下を手動設定（GraphQL API では一部フィルタ設定が制限あり）:
+### 3.3 ビューの表示フィールド・フィルタ・ソート・グループ設定
 
-| ビュー | フィルタ | ソート/グループ |
-|--------|---------|----------------|
-| Product Backlog | `is:open no:parent-issue` | Priority昇順 |
-| Sprint Board | `sprint:@current` | — |
-| Sprint Table | `sprint:@current` | Assigneeグループ, Priority昇順 |
-| Roadmap | `no:parent-issue` | — |
-| My Items | `assignee:@me is:open` | Statusグループ, Priority昇順 |
+> **注意**: GitHub Projects V2 の GraphQL API には `updateProjectV2View` mutation が存在しないため、
+> ビュー設定（表示フィールド・フィルタ・ソート・グループ）は GitHub UI から手動設定が必要です。
+
+ビュー作成後、GitHub UI で以下を設定し、各ビューで「Save」ボタンを押して保存:
+
+| ビュー | 表示フィールド | フィルタ | ソート | グループ |
+|--------|---------------|---------|--------|---------|
+| Product Backlog | Priority, Sprint, Labels, Assignees, Sub-issues progress | `is:open no:parent-issue` | Priority昇順 | — |
+| Sprint Board | Priority, Assignees, Sub-issues progress | `sprint:@current` | — | — |
+| Sprint Table | Status, Priority, Sprint, Assignees, Labels, Estimate | `sprint:@current` | Priority昇順 | Assignee |
+| Roadmap | (日付: Sprint, マーカー: Milestone, Sprint) | `no:parent-issue` | — | — |
+| My Items | Status, Priority, Sprint, Labels | `assignee:@me is:open` | Priority昇順 | Status |
+
+**設定手順**:
+1. 各ビューのタブを開く
+2. 右上の「View」ボタンをクリック
+3. 「Fields」で表示/非表示を設定
+4. 「Group by」「Sort by」を設定
+5. フィルタバーにフィルタを入力
+6. 「Save」ボタンで保存（確認ダイアログで「Save」を選択）
 
 ### 完了確認
 - [ ] 5ビューが作成されている
 - [ ] 各ビューのレイアウトが正しい（Board/Table/Roadmap）
+- [ ] 各ビューの表示フィールドが正しい
 - [ ] フィルタが設定されている
+- [ ] ソートが設定されている（該当ビュー）
+- [ ] グループが設定されている（該当ビュー）
 
 ---
 
