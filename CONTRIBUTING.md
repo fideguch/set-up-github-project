@@ -1,5 +1,7 @@
 # Contributing Guide
 
+GitHub Project Manager への貢献ガイドです。
+
 ## 開発フロー
 
 ### 1. Issue の作成
@@ -46,7 +48,7 @@ git checkout -b refine/<issue番号>-<概要>
 
 ```bash
 npm run quality    # lint + typecheck + format:check
-npm test           # Playwright リグレッションテスト (150件以上)
+npm test           # Playwright リグレッションテスト (231件)
 ```
 
 両方パスしてから PR を作成してください。
@@ -61,15 +63,15 @@ npm test           # Playwright リグレッションテスト (150件以上)
 - Squash merge を推奨
 - マージ後、関連 Issue は自動的に「Done」に遷移
 
-## ステータスワークフロー
+## Five-File Sync Rule
 
-```
-Icebox → 進行待ち → 要件作成中 → デザイン待ち → デザイン作成中
-→ アサイン待ち → 開発待ち → 開発中 → コードレビュー
-→ テスト中 → リリース待ち → リリース済み → Done
-              ↑
-          テスト落ち → 開発中（修正）
-```
+ラベル・ステータス・ビュー・フィールドを変更する際は、以下の5ファイルを同時に更新してください:
+
+1. `SKILL.md` — モード・コマンドリファレンス
+2. `README.md` — 概要テーブル・スクリプト一覧
+3. `scripts/*.sh` — 自動化スクリプト
+4. `docs/*.md` — 詳細ドキュメント
+5. `tests/skill-structure.spec.ts` — リグレッションテスト
 
 ## 優先度
 

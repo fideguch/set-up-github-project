@@ -6,25 +6,20 @@ A PM assistant skill for GitHub Projects V2. Covers environment setup, daily ope
 
 "Create an issue", "Change status", "Sprint report" — execute PM daily tasks instantly via CLI. From full project setup to Jira/Linear migration.
 
-## Overview
+## 3 Modes
 
-This repository provides reusable skills, scripts, and templates for building a GitHub Projects V2 development environment based on best practices.
+| Mode                     | Purpose                                               | Key Operations                                        |
+| ------------------------ | ----------------------------------------------------- | ----------------------------------------------------- |
+| **Mode A: Setup**        | New project environment                               | 14 statuses, 6 views, 13 labels, templates, workflows |
+| **Mode B: Operations** ★ | Issue/PR creation, status changes, backlog management | `project-ops.sh` + natural language                   |
+| **Mode C: Analytics**    | Sprint reports, velocity tracking                     | `sprint-report.sh`                                    |
 
-### What Gets Built
-
-| Component         | Details                                                                          |
-| ----------------- | -------------------------------------------------------------------------------- |
-| **Statuses**      | 14 stages (Icebox > Planning > Design > Dev > Release > Done)                    |
-| **Views**         | 6 types (Issues, Product Backlog, Sprint Board, Sprint Table, Roadmap, My Items) |
-| **Custom Fields** | Priority (P0-P4), Sprint (1w Iteration), Estimate (Number), Target (Text)        |
-| **Labels**        | 13 total (Type 6 + Area 4 + Ops 3)                                               |
-| **Templates**     | Issue (feature/bug) + PR template                                                |
-| **Automation**    | 5 Built-in Workflows + 5 GitHub Actions                                          |
+On first launch, the skill auto-detects project state: unconfigured → Mode A, configured → Mode B. Project info is saved to `.github-project-config.json` for instant reconnection.
 
 ## Prerequisites
 
 - `gh` CLI installed and authenticated
-- GitHub Classic PAT (`ghp_` token) required (Fine-grained PATs do not support Projects V2 GraphQL API)
+- GitHub Classic PAT (`ghp_` token) — Fine-grained PATs do not support Projects V2 GraphQL API
 - PAT scopes: `project`, `repo`, `read:org`
 
 ## Installation
@@ -32,93 +27,87 @@ This repository provides reusable skills, scripts, and templates for building a 
 ```bash
 git clone git@github.com:fideguch/set-up-github-project.git
 cd set-up-github-project
-./install.sh    # Installs skill to ~/.claude/skills/
+./install.sh    # Installs to ~/.claude/skills/github-project-manager/
 ```
 
-## Usage
+Invoke in Claude Code or Devin:
 
-### As a Devin Playbook
+```
+"Create an issue" "Set up project environment" "Sprint report"
+```
 
-Run the `!setup_github_project` macro in Devin to start the interactive setup.
+## Quick Start
 
-### Direct Script Execution
+### New Project Setup (Mode A)
 
 ```bash
-# Full environment setup (automated)
 ./scripts/setup-all.sh <OWNER/REPO> <PROJECT_NUMBER>
-
-# Or run individual phases
-./scripts/setup-labels.sh <OWNER/REPO>          # 13 labels
-./scripts/setup-fields.sh <OWNER> <NUMBER>       # Custom fields
-./scripts/setup-status.sh <OWNER> <NUMBER>       # 14 status options
-./scripts/setup-views.sh <OWNER> <NUMBER>        # 5 views
-./scripts/setup-templates.sh <OWNER/REPO> <NUM>  # Templates + workflows
 ```
 
-### Migration from Other Tools
-
-```bash
-# Import from Jira CSV
-./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> jira-export.csv --format jira
-
-# Import from Linear CSV
-./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> linear-export.csv --format linear
-
-# Preview without creating (dry run)
-./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> tasks.csv --dry-run
-```
-
-### Sprint Reports
-
-```bash
-./scripts/sprint-report.sh <OWNER> <NUMBER>               # Current sprint
-./scripts/sprint-report.sh <OWNER> <NUMBER> --sprint previous  # Previous sprint
-./scripts/sprint-report.sh <OWNER> <NUMBER> --json         # JSON output
-```
-
-### Project Operations (Post-Setup)
+### Daily Operations (Mode B)
 
 ```bash
 # Add issues/PRs to project
 ./scripts/project-ops.sh <OWNER> <NUMBER> add-issue <REPO> <ISSUE_NUM>
 ./scripts/project-ops.sh <OWNER> <NUMBER> add-pr <REPO> <PR_NUM>
 
-# Move cards (change status)
+# Change status (move cards)
 ./scripts/project-ops.sh <OWNER> <NUMBER> move <ITEM_ID> "開発中"
 
-# List items and fields
+# Set priority
+./scripts/project-ops.sh <OWNER> <NUMBER> set-priority <ITEM_ID> P1
+
+# List items
 ./scripts/project-ops.sh <OWNER> <NUMBER> list-items
-./scripts/project-ops.sh <OWNER> <NUMBER> list-fields
 ```
+
+### Analytics (Mode C)
+
+```bash
+./scripts/sprint-report.sh <OWNER> <NUMBER>                    # Current sprint
+./scripts/sprint-report.sh <OWNER> <NUMBER> --sprint previous  # Previous sprint
+./scripts/sprint-report.sh <OWNER> <NUMBER> --json             # JSON output
+```
+
+### Migration from Other Tools
+
+```bash
+./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> export.csv --format jira     # Jira
+./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> export.csv --format linear   # Linear
+./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> export.csv --format notion   # Notion
+./scripts/migrate-import.sh <OWNER/REPO> <NUMBER> tasks.csv --dry-run          # Preview
+```
+
+## Scripts
+
+| Script               | Mode | Purpose                                    |
+| -------------------- | ---- | ------------------------------------------ |
+| `setup-all.sh`       | A    | Full environment setup                     |
+| `setup-labels.sh`    | A    | Bulk create 13 labels                      |
+| `setup-fields.sh`    | A    | Custom fields (Priority, Estimate, Target) |
+| `setup-status.sh`    | A    | Status 14 options                          |
+| `setup-views.sh`     | A    | 5 project views                            |
+| `setup-templates.sh` | A    | Auto-deploy templates & workflows          |
+| `project-ops.sh`     | B    | Issue/PR add, status change, priority      |
+| `migrate-import.sh`  | A    | Jira/Linear/Notion CSV import              |
+| `sprint-report.sh`   | C    | Sprint report (velocity, completion)       |
+
+## Documentation
+
+- **[Operation Guide (USAGE.md)](docs/USAGE.md)** — Daily ops, views, Sprint, migration, FAQ
+- **[Workflow Definition](docs/workflow-definition.md)** — 14-status specification
+- **[View Design](docs/view-design.md)** — 6-view configuration
+- **[Automation Guide](docs/automation-guide.md)** — Workflow and script setup
 
 ## Developer Setup
 
 ```bash
 npm install
-npm test            # Regression tests (170+)
+npm test            # 231 regression tests
 npm run quality     # lint + typecheck + format:check
 ```
 
-**Requirements:** Node.js 20+, ShellCheck (optional: `brew install shellcheck`)
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
-
-## Sub-Skills
-
-| Skill                         | Description                                                     |
-| ----------------------------- | --------------------------------------------------------------- |
-| **code-quality**              | ESLint + Prettier + Husky + lint-staged integrated setup        |
-| **ci-cd-pipeline**            | GitHub Actions CI/CD quality pipeline                           |
-| **typescript-best-practices** | TypeScript recommended tsconfig and type-safe coding guidelines |
-| **git-workflow**              | Conventional Commits, branch naming, PR/Issue templates         |
-| **project-setup-automation**  | GitHub Projects V2 full environment automation                  |
-
-## Documentation
-
-- **[Operation Guide (USAGE.md)](docs/USAGE.md)** — Views, status workflow, Sprint ops, Roadmap, automation
-- **[Workflow Definition](docs/workflow-definition.md)** — 14-status workflow specification
-- **[View Design](docs/view-design.md)** — 5-view design specification
-- **[Automation Guide](docs/automation-guide.md)** — Workflow setup and troubleshooting
+Requirements: Node.js 20+, ShellCheck (optional). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

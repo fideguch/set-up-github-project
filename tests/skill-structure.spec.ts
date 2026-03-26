@@ -511,9 +511,9 @@ test.describe('Shell Script Validation', () => {
     }
   });
 
-  test('all label names match between setup-labels.sh and README.md', () => {
+  test('all label names match between setup-labels.sh and CONTRIBUTING.md', () => {
     const scriptContent = readFile('scripts/setup-labels.sh');
-    const readmeContent = readFile('README.md');
+    const readmeContent = readFile('CONTRIBUTING.md');
     const labelNames = [
       'feature',
       'bug',
@@ -548,13 +548,12 @@ test.describe('Cross-Reference Validation', () => {
     expect(readme).toContain('USAGE.md');
   });
 
-  test('README file tree lists all workflow templates', () => {
+  test('README script table lists key scripts', () => {
     const readme = readFile('README.md');
-    expect(readme).toContain('ci.yml');
-    expect(readme).toContain('project-automation.yml');
-    expect(readme).toContain('pr-labeler.yml');
-    expect(readme).toContain('stale-detection.yml');
-    expect(readme).toContain('roadmap-date-sync.yml');
+    expect(readme).toContain('setup-all.sh');
+    expect(readme).toContain('project-ops.sh');
+    expect(readme).toContain('sprint-report.sh');
+    expect(readme).toContain('migrate-import.sh');
   });
 
   test('README file tree lists all scripts', () => {
@@ -574,8 +573,8 @@ test.describe('Cross-Reference Validation', () => {
     expect(readme).toContain('project-setup-automation');
   });
 
-  test('README label table has exactly 13 labels', () => {
-    const readme = readFile('README.md');
+  test('CONTRIBUTING.md has all 13 labels', () => {
+    const contributing = readFile('CONTRIBUTING.md');
     const labelNames = [
       'feature',
       'bug',
@@ -592,7 +591,7 @@ test.describe('Cross-Reference Validation', () => {
       'good-first-issue',
     ];
     for (const label of labelNames) {
-      expect(readme).toContain(`\`${label}\``);
+      expect(contributing).toContain(`\`${label}\``);
     }
   });
 
@@ -666,9 +665,8 @@ test.describe('Cross-Reference Validation', () => {
     }
   });
 
-  test('label colors match between setup-labels.sh and README.md', () => {
+  test('label colors are defined in setup-labels.sh', () => {
     const script = readFile('scripts/setup-labels.sh');
-    const readme = readFile('README.md');
     const colorMap: Record<string, string> = {
       feature: '0E8A16',
       bug: 'D73A4A',
@@ -686,7 +684,6 @@ test.describe('Cross-Reference Validation', () => {
     };
     for (const [_label, color] of Object.entries(colorMap)) {
       expect(script).toContain(color);
-      expect(readme).toContain(`#${color}`);
     }
   });
 
@@ -774,14 +771,14 @@ test.describe('Documentation Consistency', () => {
     expect(readme).toContain('前提条件');
   });
 
-  test('README has usage section', () => {
+  test('README has quick start section', () => {
     const readme = readFile('README.md');
-    expect(readme).toContain('使い方');
+    expect(readme).toContain('クイックスタート');
   });
 
-  test('README has file structure section', () => {
+  test('README has script list section', () => {
     const readme = readFile('README.md');
-    expect(readme).toContain('ファイル構成');
+    expect(readme).toContain('スクリプト一覧');
   });
 
   test('README mentions ISC license', () => {
@@ -832,7 +829,7 @@ test.describe('Sync Rule Validation', () => {
     expect(readme).toContain('USAGE.md');
   });
 
-  test('label names match across scripts, README, and USAGE.md', () => {
+  test('label names match across scripts, CONTRIBUTING, and USAGE.md', () => {
     const labels = [
       'feature',
       'bug',
@@ -849,7 +846,7 @@ test.describe('Sync Rule Validation', () => {
       'good-first-issue',
     ];
     const script = readFile('scripts/setup-labels.sh');
-    const readme = readFile('README.md');
+    const readme = readFile('CONTRIBUTING.md');
     const usage = readFile('docs/USAGE.md');
 
     for (const label of labels) {
