@@ -206,11 +206,24 @@ export async function sprintReport(
     blockedItems,
   };
 
+  const itemCount = project.items.nodes.length;
+  const truncated = itemCount >= 200;
+
   return {
     content: [
       {
         type: 'text',
-        text: JSON.stringify(report, null, 2),
+        text: JSON.stringify(
+          {
+            ...report,
+            truncated,
+            ...(truncated && {
+              warning: `Project has ${itemCount}+ items. Sprint report may be incomplete.`,
+            }),
+          },
+          null,
+          2
+        ),
       },
     ],
   };

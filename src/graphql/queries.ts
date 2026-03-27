@@ -46,12 +46,37 @@ export const GET_PROJECT_FIELDS = `
   }
 `;
 
-/** Get all items in a project with field values. */
+/** Get a single issue by number with full details. */
+export const GET_ISSUE_BY_NUMBER = `
+  query GetIssueByNumber($owner: String!, $repo: String!, $number: Int!) {
+    repository(owner: $owner, name: $repo) {
+      issue(number: $number) {
+        id
+        number
+        title
+        body
+        state
+        url
+        labels(first: 20) { nodes { name } }
+        assignees(first: 10) { nodes { login } }
+        milestone { title }
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+/** Get all items in a project with field values (with cursor pagination). */
 export const GET_PROJECT_ITEMS = `
-  query GetProjectItems($projectId: ID!) {
+  query GetProjectItems($projectId: ID!, $cursor: String) {
     node(id: $projectId) {
       ... on ProjectV2 {
-        items(first: 200) {
+        items(first: 100, after: $cursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             id
             content {

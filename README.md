@@ -129,14 +129,21 @@ Claude Desktop の設定 (`~/.claude/settings.json` または MCP 設定):
 
 ### MCP ツール一覧
 
-| ツール                  | 説明                                          |
-| ----------------------- | --------------------------------------------- |
-| `project_list_fields`   | フィールド・オプション一覧                    |
-| `project_list_items`    | アイテム一覧（ステータス/優先度フィルタ対応） |
-| `project_add_item`      | Issue/PR をプロジェクトに追加                 |
-| `project_move_status`   | ステータス変更                                |
-| `project_set_priority`  | 優先度設定（P0-P4）                           |
-| `project_sprint_report` | Sprint レポート生成                           |
+| ツール                     | 方式    | 説明                                                               |
+| -------------------------- | ------- | ------------------------------------------------------------------ |
+| `project_list_fields`      | GraphQL | フィールド・オプション一覧                                         |
+| `project_list_items`       | GraphQL | アイテム一覧（ステータス/優先度フィルタ対応、ページネーション）    |
+| `project_add_item`         | GraphQL | Issue/PR をプロジェクトに追加                                      |
+| `project_move_status`      | GraphQL | ステータス変更（別名対応: "dev"→"開発中"）                         |
+| `project_set_priority`     | GraphQL | 優先度設定（P0-P4）                                                |
+| `project_sprint_report`    | GraphQL | Sprint レポート生成                                                |
+| `project_get_issue`        | GraphQL | Issue 詳細取得（タイトル、本文、ラベル、アサイン、マイルストーン） |
+| `project_edit_issue`       | gh CLI  | Issue のタイトル・本文を編集                                       |
+| `project_manage_labels`    | gh CLI  | Issue のラベル追加・削除                                           |
+| `project_manage_assignees` | gh CLI  | Issue のアサイン追加・削除                                         |
+| `project_set_issue_state`  | gh CLI  | Issue のクローズ・リオープン                                       |
+
+**ステータス別名**: `dev`→`開発中`、`review`→`コードレビュー`、`testing`→`テスト中` など。英語の省略形で日本語ステータスを操作可能。
 
 ## 連携スキル
 
@@ -161,7 +168,7 @@ Claude Desktop の設定 (`~/.claude/settings.json` または MCP 設定):
 
 ```bash
 npm install
-npm test            # リグレッションテスト (293件)
+npm test            # リグレッションテスト (339件+)
 npm run build       # MCP Server ビルド
 npm run quality     # lint + typecheck + format:check
 ```

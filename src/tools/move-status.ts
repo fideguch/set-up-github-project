@@ -3,6 +3,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { GET_PROJECT_ID, GET_PROJECT_FIELDS } from '../graphql/queries.js';
 import { UPDATE_ITEM_FIELD } from '../graphql/mutations.js';
 import type { FieldNode, SingleSelectFieldNode } from '../types/index.js';
+import { resolveStatusAlias } from '../utils/status-alias.js';
 
 interface GetProjectIdResponse {
   readonly user: {
@@ -34,10 +35,19 @@ export async function moveStatus(
     status: string;
   }
 ): Promise<CallToolResult> {
-  const projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let projectData: GetProjectIdResponse;
+  try {
+    projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to fetch project: ${message}` }],
+    };
+  }
 
   const project = projectData.user.projectV2;
   if (!project) {
@@ -52,9 +62,18 @@ export async function moveStatus(
     };
   }
 
-  const fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
-    projectId: project.id,
-  });
+  let fieldsData: GetFieldsResponse;
+  try {
+    fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
+      projectId: project.id,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to fetch fields: ${message}` }],
+    };
+  }
 
   const statusField = findSingleSelectField(fieldsData.node.fields.nodes, 'Status');
   if (!statusField) {
@@ -64,26 +83,47 @@ export async function moveStatus(
     };
   }
 
-  const option = statusField.options.find((o) => o.name === args.status);
-  if (!option) {
-    const available = statusField.options.map((o) => o.name).join(', ');
+  const availableNames = statusField.options.map((o) => o.name);
+  const resolved = resolveStatusAlias(args.status, availableNames);
+  if (!resolved) {
     return {
       isError: true,
       content: [
         {
           type: 'text',
-          text: `Status '${args.status}' not found. Available: ${available}`,
+          text: `Status '${args.status}' not found. Available: ${availableNames.join(', ')}`,
         },
       ],
     };
   }
 
-  await gql(UPDATE_ITEM_FIELD, {
-    projectId: project.id,
-    itemId: args.itemId,
-    fieldId: statusField.id,
-    optionId: option.id,
-  });
+  const option = statusField.options.find((o) => o.name === resolved);
+  if (!option) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `Internal error: resolved status '${resolved}' not found in options.`,
+        },
+      ],
+    };
+  }
+
+  try {
+    await gql(UPDATE_ITEM_FIELD, {
+      projectId: project.id,
+      itemId: args.itemId,
+      fieldId: statusField.id,
+      optionId: option.id,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to update status: ${message}` }],
+    };
+  }
 
   return {
     content: [
@@ -91,8 +131,8 @@ export async function moveStatus(
         type: 'text',
         text: JSON.stringify(
           {
-            success: true,
-            message: `Status changed: ${args.itemId} → ${args.status}`,
+            summary: `Status changed: ${args.itemId} → ${resolved}`,
+            data: { itemId: args.itemId, status: resolved, success: true },
           },
           null,
           2

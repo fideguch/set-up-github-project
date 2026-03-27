@@ -37,15 +37,16 @@ github-project-manager/
 │   ├── index.ts                 # Entry point (stdio transport)
 │   ├── server.ts                # Server factory
 │   ├── graphql/                 # GraphQL client, queries, mutations
-│   ├── tools/                   # 6 MCP tools (list-fields, list-items, add-item, move-status, set-priority, sprint-report)
+│   ├── tools/                   # 11 MCP tools (list-fields, list-items, add-item, move-status, set-priority, sprint-report, get-issue, edit-issue, manage-labels, manage-assignees, set-issue-state)
 │   ├── schemas/                 # Zod input schemas
 │   └── types/                   # TypeScript type definitions
 ├── templates/                   # Files to copy into TARGET repos
 ├── skills/                      # 5 reusable sub-skills
 ├── docs/                        # Detailed documentation
-├── tests/                       # 293 Playwright regression tests
-│   ├── skill-structure.spec.ts  # Structure validation (246 tests)
-│   └── mcp/                     # MCP tool/schema/server tests (47 tests)
+├── tests/                       # 339+ Playwright regression tests
+│   ├── skill-structure.spec.ts  # Structure validation (250+ tests)
+│   ├── mcp/                     # MCP tool/schema/server tests (67+ tests)
+│   └── scenarios/               # Scenario tests (25 tests)
 └── .github/                     # CI/CD for THIS repo
 ```
 
@@ -54,7 +55,7 @@ github-project-manager/
 - Skill definition: Markdown (SKILL.md, 3-mode architecture)
 - MCP Server: TypeScript + @modelcontextprotocol/sdk + @octokit/graphql + Zod
 - Automation: Shell scripts (bash, gh CLI, GraphQL) — 9 scripts, 1,498 lines
-- Tests: Playwright + TypeScript (strict mode) — 293 tests
+- Tests: Playwright + TypeScript (strict mode) — 339+ tests
 - Code quality: ESLint + Prettier + Husky + lint-staged
 - CI: GitHub Actions (lint, typecheck, format:check, shellcheck, test)
 
@@ -82,7 +83,7 @@ npm run quality && npm test
 ## Key Commands
 
 ```bash
-npm test                          # Run 293 regression tests
+npm test                          # Run 339+ regression tests
 npm run quality                   # lint + typecheck + format:check
 npm run build                     # Build MCP server to dist/
 npm run format                    # Auto-format all files

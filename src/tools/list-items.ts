@@ -11,7 +11,10 @@ interface GetProjectIdResponse {
 
 interface GetItemsResponse {
   readonly node: {
-    readonly items: { readonly nodes: readonly ItemNode[] };
+    readonly items: {
+      readonly pageInfo: { readonly hasNextPage: boolean };
+      readonly nodes: readonly ItemNode[];
+    };
   };
 }
 
@@ -99,11 +102,24 @@ export async function listItems(
     items = items.filter((i) => i.priority?.startsWith(args.priorityFilter!));
   }
 
+  const truncated = itemsData.node.items.pageInfo.hasNextPage;
+
   return {
     content: [
       {
         type: 'text',
-        text: JSON.stringify({ items, totalCount: items.length }, null, 2),
+        text: JSON.stringify(
+          {
+            items,
+            totalCount: items.length,
+            truncated,
+            ...(truncated && {
+              warning: 'Results limited to first 100 items. Project has more items not shown.',
+            }),
+          },
+          null,
+          2
+        ),
       },
     ],
   };

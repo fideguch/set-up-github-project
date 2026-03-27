@@ -10,30 +10,67 @@ intent: >-
   PMが「Issue作って」「ステータス変えて」「Sprintレポート出して」と言うだけで
   gh CLI + GraphQL API を駆使して即座に実行する日常アシスタント。
   初回起動時にプロジェクト情報を収集し、以降の操作を最適化する。
+  Use when managing GitHub Projects V2 — setup, daily ops, issue editing, or analytics.
 type: interactive
+theme: github-projects-v2-pm
 best_for:
   - 'GitHub Projects V2 の日常管理全般'
-  - 'Issue 作成・ラベル付け・アサイン'
+  - 'Issue 作成・編集・ラベル付け・アサイン・状態変更'
   - 'PR 作成支援・ステータス自動遷移'
   - 'Sprint 計画・レポート・ベロシティ追跡'
   - '新規プロジェクト環境の一括構築'
   - 'Jira/Linear/Notion からの移行'
+scenarios:
+  - 'New project: setup labels, statuses, views, templates from scratch'
+  - 'Daily ops: create/edit issues, change status, manage sprint'
+  - 'Issue editing: modify title, body, labels, assignees, open/close'
+  - 'Issue identification: search by keyword, confirm, then edit'
+  - 'designs/ awareness: detect requirements_designer output and use as context'
 triggers:
+  # 日本語 — 作成・編集
   - 'Issue を作成して'
+  - 'Issue を編集して'
+  - 'Issue を閉じて'
   - 'PR を作って'
-  - 'ステータスを変更'
-  - 'Sprint レポート'
-  - 'GitHub Projects'
-  - 'プロジェクト管理'
   - 'ラベルを付けて'
-  - 'プロジェクト環境を構築'
-  - 'Jira から移行'
-  - '!github_project_manager'
+  - 'ラベル変更'
+  - 'アサインして'
+  # 日本語 — ステータス・確認
+  - 'ステータスを変更'
+  - 'ステータス確認'
+  - 'プロジェクト状態'
+  - '進捗確認'
+  - 'Issue 一覧'
   - 'バックログを確認'
   - 'ブロッカーを確認'
+  # 日本語 — レポート・分析
+  - 'Sprint レポート'
   - 'ベロシティ'
+  # 日本語 — セットアップ・管理
+  - 'プロジェクト管理'
+  - 'プロジェクト環境を構築'
   - 'プロジェクトのセットアップ'
-  - 'アサインして'
+  - 'GitHub Projects'
+  # 日本語 — 移行
+  - 'Jira から移行'
+  - 'Linear から移行'
+  - 'Notion から移行'
+  - 'CSV インポート'
+  # 日本語 — 継続・ヘルプ
+  - '続けて'
+  - '前回のレポート'
+  - 'ヘルプ'
+  - '使い方'
+  - '何ができる'
+  # English
+  - 'Create issue'
+  - 'Edit issue'
+  - 'Show backlog'
+  - 'Change status'
+  - 'Sprint report'
+  - 'Project setup'
+  # System
+  - '!github_project_manager'
 ---
 
 # GitHub Project Manager
@@ -126,11 +163,31 @@ Mode C: 分析・レポート
    - `.github-project-config.json` を作成
    - プロジェクトID、StatusフィールドIDを自動取得して保存
 
+### designs/ 検出（requirements_designer 連携）
+
+`.github-project-config.json` 読み込み後、`designs/` ディレクトリの存在を確認。
+
+存在する場合:
+
+1. `designs/README.md` を読み、プロジェクト概要を把握
+2. `designs/user_stories.md` を読み、ユーザーストーリー一覧を把握
+3. `designs/functional_requirements.md` を読み、機能要件を把握
+4. 「要件情報を検出しました。Issue 作成時に参照します」と報告
+
+Issue 作成時:
+
+- designs/ の内容をコンテキストとして参照し、関連する要件やストーリーがあれば提案に活用
+
+不在の場合:
+
+- 通常どおり操作を継続（designs/ は任意）
+
 ### 再起動時
 
 `.github-project-config.json` が存在する場合:
 
 - 設定を読み込み、即座に操作可能状態に
+- designs/ があれば要件コンテキストも再読み込み
 - 「プロジェクト <REPO> (#<NUMBER>) に接続しました。何をしますか？」
 
 ---

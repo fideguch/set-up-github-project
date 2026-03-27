@@ -47,8 +47,8 @@ test.describe('project_move_status tool', () => {
 
     expect(result.isError).toBeUndefined();
     const data = JSON.parse((result.content[0] as { text: string }).text);
-    expect(data.success).toBe(true);
-    expect(data.message).toContain('開発中');
+    expect(data.summary).toContain('開発中');
+    expect(data.data.success).toBe(true);
   });
 
   test('returns error for invalid status', async () => {

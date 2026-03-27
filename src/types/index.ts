@@ -88,6 +88,22 @@ export interface IterationValueNode {
   readonly iterationId: string;
 }
 
+// --- Issue detail type (for get-issue tool) ---
+
+export interface IssueDetail {
+  readonly id: string;
+  readonly number: number;
+  readonly title: string;
+  readonly body: string | null;
+  readonly state: string;
+  readonly url: string;
+  readonly labels: readonly string[];
+  readonly assignees: readonly string[];
+  readonly milestone: string | null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
 // --- MCP tool return types ---
 
 export interface ProjectItem {
