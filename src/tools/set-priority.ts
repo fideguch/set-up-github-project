@@ -34,10 +34,19 @@ export async function setPriority(
     priority: string;
   }
 ): Promise<CallToolResult> {
-  const projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let projectData: GetProjectIdResponse;
+  try {
+    projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to fetch project: ${message}` }],
+    };
+  }
 
   const project = projectData.user.projectV2;
   if (!project) {
@@ -52,9 +61,18 @@ export async function setPriority(
     };
   }
 
-  const fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
-    projectId: project.id,
-  });
+  let fieldsData: GetFieldsResponse;
+  try {
+    fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
+      projectId: project.id,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to fetch fields: ${message}` }],
+    };
+  }
 
   const priorityField = findSingleSelectField(fieldsData.node.fields.nodes, 'Priority');
   if (!priorityField) {
@@ -84,12 +102,20 @@ export async function setPriority(
     };
   }
 
-  await gql(UPDATE_ITEM_FIELD, {
-    projectId: project.id,
-    itemId: args.itemId,
-    fieldId: priorityField.id,
-    optionId: option.id,
-  });
+  try {
+    await gql(UPDATE_ITEM_FIELD, {
+      projectId: project.id,
+      itemId: args.itemId,
+      fieldId: priorityField.id,
+      optionId: option.id,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `Failed to update priority: ${message}` }],
+    };
+  }
 
   return {
     content: [

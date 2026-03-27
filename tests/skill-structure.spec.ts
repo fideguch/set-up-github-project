@@ -1462,7 +1462,7 @@ test.describe('MCP Server Structure Validation', () => {
     expect(fileExists('src/graphql/mutations.ts')).toBe(true);
   });
 
-  test('src/tools/ has all 6 tool files', () => {
+  test('src/tools/ has all 11 tool files', () => {
     expect(fileExists('src/tools/index.ts')).toBe(true);
     expect(fileExists('src/tools/list-fields.ts')).toBe(true);
     expect(fileExists('src/tools/list-items.ts')).toBe(true);
@@ -1470,6 +1470,16 @@ test.describe('MCP Server Structure Validation', () => {
     expect(fileExists('src/tools/move-status.ts')).toBe(true);
     expect(fileExists('src/tools/set-priority.ts')).toBe(true);
     expect(fileExists('src/tools/sprint-report.ts')).toBe(true);
+    expect(fileExists('src/tools/get-issue.ts')).toBe(true);
+    expect(fileExists('src/tools/edit-issue.ts')).toBe(true);
+    expect(fileExists('src/tools/manage-labels.ts')).toBe(true);
+    expect(fileExists('src/tools/manage-assignees.ts')).toBe(true);
+    expect(fileExists('src/tools/set-issue-state.ts')).toBe(true);
+  });
+
+  test('src/utils/ has infrastructure files', () => {
+    expect(fileExists('src/utils/gh-cli.ts')).toBe(true);
+    expect(fileExists('src/utils/status-alias.ts')).toBe(true);
   });
 
   test('src/schemas/index.ts has all schema exports', () => {
@@ -1480,6 +1490,12 @@ test.describe('MCP Server Structure Validation', () => {
     expect(content).toContain('listItemsSchema');
     expect(content).toContain('listFieldsSchema');
     expect(content).toContain('sprintReportSchema');
+    expect(content).toContain('getIssueSchema');
+    expect(content).toContain('editIssueSchema');
+    expect(content).toContain('manageLabelsSchema');
+    expect(content).toContain('manageAssigneesSchema');
+    expect(content).toContain('setIssueStateSchema');
+    expect(content).toContain('repoParam');
   });
 
   test('src/types/index.ts has core type exports', () => {
@@ -1515,7 +1531,7 @@ test.describe('MCP Server Structure Validation', () => {
     expect(content).toMatch(/^#!\/usr\/bin\/env node/);
   });
 
-  test('src/tools/index.ts registers all 6 tools', () => {
+  test('src/tools/index.ts registers all 11 tools', () => {
     const content = readFile('src/tools/index.ts');
     expect(content).toContain('project_list_fields');
     expect(content).toContain('project_list_items');
@@ -1523,6 +1539,11 @@ test.describe('MCP Server Structure Validation', () => {
     expect(content).toContain('project_move_status');
     expect(content).toContain('project_set_priority');
     expect(content).toContain('project_sprint_report');
+    expect(content).toContain('project_get_issue');
+    expect(content).toContain('project_edit_issue');
+    expect(content).toContain('project_manage_labels');
+    expect(content).toContain('project_manage_assignees');
+    expect(content).toContain('project_set_issue_state');
   });
 
   test('GraphQL queries contain required operations', () => {
@@ -1531,6 +1552,7 @@ test.describe('MCP Server Structure Validation', () => {
     expect(queries).toContain('GetProjectFields');
     expect(queries).toContain('GetProjectItems');
     expect(queries).toContain('GetProjectFull');
+    expect(queries).toContain('GetIssueByNumber');
   });
 
   test('GraphQL mutations contain required operations', () => {

@@ -1,114 +1,105 @@
-# Handoff: GitHub Project Manager v3.0.0
+# Handoff: GitHub Project Manager v4.0 実装完了
 
 ## 現在の状態
 
 - **リポジトリ**: https://github.com/fideguch/my_pm_tools
 - **リモート**: `git@github.com:fideguch/my_pm_tools.git` (SSH)
 - **ブランチ**: main
-- **最新コミット**: `ae0f32f` feat: add MCP Server — 6 tools for AI agent integration (ADR-007)
-- **テスト**: 293 passed (3.4s)
+- **テスト**: 339+ passed
 - **品質**: lint + typecheck + format:check 全パス
 - **ビルド**: `npm run build` 成功
-- **評価スコア**: 3.53/5.00 → MCP 実装済み（再評価で 3.83+ 見込み）
 
-## セッションで実施した作業
+## 今回のセッション: v4.0 実装
 
-### Phase 8: MCP Server 実装（v3.0.0）— 今回のセッション
+### Phase 1: SKILL.md トリガー拡張
 
-#### 8-0: 公開安全性監査
+- triggers: 15 → 37（+22）
+- `scenarios:` 5件、`theme:` フィールド追加
+- `intent:` に英語ガイダンス、`best_for:` に編集機能反映
+- カテゴリ別コメント付き（日本語/英語/移行/ヘルプ/システム）
 
-- リポジトリ全体のセキュリティ監査実施 → **A評価（安全）**
-- `.gitignore` に `.env*` と `.claude/` を防御的に追加
-- ハードコード秘密鍵: なし、個人情報: 公開 GitHub ユーザー名のみ
+### Phase 2: Issue 編集 + 既存ツール改善
 
-#### 8-1: North Star 矛盾の解決
+#### 新規ファイル (8)
 
-- Non-Goals「Slack/Teams 連携の自前実装はしない」と P05-P08 の矛盾を発見
-- **解決**: v1 = MCP core API 層のみ（North Star 尊重）、Slack/Google は v2 以降
-- ADR-007 作成、DECISION-LOG 更新（P05/P06 を deferred に変更、P07/P08 を ADR-007 で実現）
+| ファイル                        | 内容                                     |
+| ------------------------------- | ---------------------------------------- |
+| `src/utils/gh-cli.ts`           | GhRunner 型 + createGhRunner()           |
+| `src/utils/status-alias.ts`     | ステータス別名解決（完全→別名→部分一致） |
+| `src/tools/get-issue.ts`        | GraphQL で Issue 詳細取得                |
+| `src/tools/edit-issue.ts`       | gh CLI で Issue タイトル・本文編集       |
+| `src/tools/manage-labels.ts`    | gh CLI でラベル追加・削除                |
+| `src/tools/manage-assignees.ts` | gh CLI でアサイン追加・削除              |
+| `src/tools/set-issue-state.ts`  | gh CLI で Issue クローズ・リオープン     |
+| `tests/scenarios/fixtures/`     | mock-gql.ts, mock-gh-cli.ts              |
 
-#### 8-2: MCP Server 基盤構築
+#### 変更ファイル (6)
 
-- 依存パッケージ: `@modelcontextprotocol/sdk` v1.28.0, `@octokit/graphql` v9, `zod` v4
-- `tsconfig.build.json` 新規作成、`tsconfig.json` に `src/` 追加
-- `src/types/index.ts` — 型定義（ProjectV2, FieldNode, ItemNode, SprintReport 等）
-- `src/graphql/client.ts` — @octokit/graphql クライアント（GITHUB_TOKEN 認証）
-- `src/graphql/queries.ts` — 4つの GraphQL クエリ（project-ops.sh/sprint-report.sh から移植）
-- `src/graphql/mutations.ts` — 2つの GraphQL ミューテーション
-- `src/schemas/index.ts` — 6つの Zod スキーマ
-- `package.json` に `"type": "module"`, `bin`, `build` script 追加
+| ファイル                   | 変更内容                                    |
+| -------------------------- | ------------------------------------------- |
+| `src/tools/index.ts`       | registerTools(server, gql, gh?) — 11 ツール |
+| `src/server.ts`            | createServer(gql, gh?) — gh オプショナル    |
+| `src/schemas/index.ts`     | repoParam 抽出 + 5 新規スキーマ             |
+| `src/types/index.ts`       | IssueDetail インターフェース追加            |
+| `src/graphql/queries.ts`   | GET_ISSUE_BY_NUMBER + ページネーション      |
+| `src/tools/move-status.ts` | ステータス別名マッチ + summary レスポンス   |
 
-#### 8-3: 6 MCP ツール実装
+### Phase 3: designs/ コンテキスト認識
 
-| ツール                  | ファイル                     | 元スクリプト                           |
-| ----------------------- | ---------------------------- | -------------------------------------- |
-| `project_list_fields`   | `src/tools/list-fields.ts`   | project-ops.sh `list-fields`           |
-| `project_list_items`    | `src/tools/list-items.ts`    | project-ops.sh `list-items`            |
-| `project_add_item`      | `src/tools/add-item.ts`      | project-ops.sh `add-issue/add-pr`      |
-| `project_move_status`   | `src/tools/move-status.ts`   | project-ops.sh `move`                  |
-| `project_set_priority`  | `src/tools/set-priority.ts`  | project-ops.sh `set-priority`          |
-| `project_sprint_report` | `src/tools/sprint-report.ts` | sprint-report.sh (Python → TypeScript) |
+- SKILL.md オンボーディングに designs/ 検出ステップ追加
+- Issue 作成時に Req-ID 付与、ラベル/Priority 自動推定
+- designs/ 不在時はスキップ（任意）
 
-- `src/tools/index.ts` — registerTool で6ツールを登録
-- `src/server.ts` — McpServer ファクトリ（テスト用に分離）
-- `src/index.ts` — stdio エントリポイント（shebang 付き）
+### Phase 4: シナリオテスト
 
-#### 8-4: テスト追加（+62 テスト）
+5 シナリオ、25 テスト:
 
-- `tests/mcp/schemas.spec.ts` — Zod スキーマ検証（17テスト）
-- `tests/mcp/server.spec.ts` — サーバーライフサイクル（3テスト）
-- `tests/mcp/tools/*.spec.ts` — 6ツール別テスト（GraphQL モック、27テスト）
-- `tests/skill-structure.spec.ts` — MCP 構造検証セクション追加（15テスト）
-- 既存テストの ESM 対応修正（`__dirname` → `fileURLToPath`）
+- `onboarding.spec.ts` — 新規/既存プロジェクトフロー (4)
+- `daily-operations.spec.ts` — リスト/フィルタ/ステータス変更/別名 (6)
+- `issue-editing.spec.ts` — get→edit→labels→assignees→close/reopen (6)
+- `issue-identification.spec.ts` — キーワード検索→確認→編集 (5)
+- `designs-awareness.spec.ts` — designs/ 検出・Req-ID・不在処理 (4)
 
-#### 8-5: ドキュメント更新
+### Phase 5: Five-File Sync & ドキュメント
 
-- README.md / README.en.md — MCP Server セクション追加、テスト数更新
-- CLAUDE.md — `src/` 構造追加、Tech Stack に MCP Server 追加、テスト数更新
-- ADR-007 作成、DECISION-LOG 更新、MEMORY.md 更新
+- skill-structure.spec.ts: 6→11 ツール、utils 存在、新スキーマチェック
+- README.md: MCP ツール表 6→11、ステータス別名説明
+- ADR-008: gh CLI ハイブリッドアプローチ
+- DECISION-LOG: P07-P11 を Implemented に更新
 
 ## メトリクス
 
-| 指標           | v2.1.0          | v3.0.0                    |
-| -------------- | --------------- | ------------------------- |
-| テスト         | 231 件          | **293 件** (+62)          |
-| スクリプト     | 9 本 (1,498 行) | 9 本 (1,498 行)           |
-| MCP ツール     | 0               | **6 ツール**              |
-| TypeScript src | 0 行            | **~800 行** (13 ファイル) |
-| 総行数         | ~10,000 行      | **~12,400 行**            |
-| ADR            | 6 件            | **7 件**                  |
-| テスト実行時間 | 2.6 秒          | 3.4 秒                    |
+| 指標           | v3.0.0  | v4.0        |
+| -------------- | ------- | ----------- |
+| テスト         | 293 件  | **339+ 件** |
+| MCP ツール     | 6       | **11** (+5) |
+| TypeScript src | ~800 行 | ~1,200 行   |
+| ADR            | 7 件    | **8 件**    |
+| triggers       | 15      | **37**      |
+
+## 重要ファイル
+
+| ファイル                    | 役割                                   |
+| --------------------------- | -------------------------------------- |
+| `src/tools/index.ts`        | ツール登録ハブ (11 ツール)             |
+| `src/schemas/index.ts`      | Zod スキーマ (11 スキーマ + repoParam) |
+| `src/types/index.ts`        | 型定義 (IssueDetail 追加)              |
+| `src/utils/gh-cli.ts`       | gh CLI ラッパー (GhRunner)             |
+| `src/utils/status-alias.ts` | ステータス別名解決                     |
+| `src/graphql/queries.ts`    | GET_ISSUE_BY_NUMBER + ページネーション |
+| `SKILL.md`                  | トリガー 37 + designs/ 連携            |
 
 ## 次のセッションでやること
 
-### 優先度 1: 評価スコア再計算
+- `npm run build` でビルド確認 → `git push`
+- README.en.md のミラー更新
+- docs/USAGE.md に Issue 編集操作ガイド追加
+- CHANGELOG.md に v4.0 エントリ追加
 
-MCP Server 実装後のスコアを再評価する:
+## 将来検討（v4.0 スコープ外）
 
-- AI Intelligence: 2.5 → 4.0 (MCP 経由で AI エージェントから操作可能に)
-- Integration: 3.5 → 4.0 (MCP プロトコル対応)
-- 目標: 3.53 → **3.83+**
-
-### 優先度 2: バーンダウン + サイクルタイム（Analytics 強化）
-
-- sprint-report.sh / sprint-report.ts にバーンダウンチャートデータ追加
-- サイクルタイム（Issue オープン → Done の日数）計算
-- 影響: Analytics 3.0 → 4.5、総合 +0.15
-
-### 優先度 3: スクリプト動作 E2E テスト
-
-- 現在のテストは構造/内容検証のみ
-- setup-all.sh, project-ops.sh の実際の動作テスト（モック GitHub API）
-- 影響: Maturity 3.5 → 4.5、総合 +0.10
-
-### 優先度 4: CI/CD にビルドステップ追加
-
-- `.github/workflows/ci.yml` に `npm run build` を追加
-- MCP Server のビルド成功を CI で保証
-
-### 将来検討（v2 以降）
-
-- **Slack 連携** (P05): ADR-007 で deferred。MCP core 安定後に検討
-- **Google Workspace 連携** (P06): 同上
-- **npm パッケージ化** (P01): `npx github-project-manager` で MCP Server を起動
-- **Streamable HTTP transport**: リモートクライアント対応
+- Undo スタック → `gh issue reopen` で手動復元可能
+- バッチ Import ツール → ユーザーが個別に Issue 化
+- AI Issue 生成 → Claude 自体の責務
+- 予測分析/バーンダウン → 個人チームに過剰
+- Slack/Google 連携 → ADR-007 で v2 以降に延期済み

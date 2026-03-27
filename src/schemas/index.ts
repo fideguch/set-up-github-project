@@ -6,13 +6,21 @@ export const projectParams = {
   projectNumber: z.number().int().positive().describe('GitHub Project V2 number'),
 };
 
+/** Common repo parameter for issue-level operations. */
+export const repoParam = {
+  repo: z
+    .string()
+    .regex(
+      /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/,
+      "Must be in 'owner/repo' format (alphanumeric, hyphens, dots, underscores)"
+    )
+    .describe("Repository in 'owner/repo' format"),
+};
+
 /** project_add_item input schema */
 export const addItemSchema = {
   ...projectParams,
-  repo: z
-    .string()
-    .regex(/^[^/]+\/[^/]+$/, "Must be in 'owner/repo' format")
-    .describe("Repository in 'owner/repo' format"),
+  ...repoParam,
   itemNumber: z.number().int().positive().describe('Issue or Pull Request number'),
   itemType: z.enum(['issue', 'pr']).default('issue').describe('Type of item to add'),
 };
@@ -50,4 +58,45 @@ export const sprintReportSchema = {
     .string()
     .default('current')
     .describe("Sprint selector: 'current', 'previous', or a sprint title"),
+};
+
+/** project_get_issue input schema */
+export const getIssueSchema = {
+  ...repoParam,
+  issueNumber: z.number().int().positive().describe('Issue number'),
+};
+
+/** project_edit_issue input schema */
+export const editIssueSchema = {
+  ...repoParam,
+  issueNumber: z.number().int().positive().describe('Issue number'),
+  title: z.string().optional().describe('New title (optional)'),
+  body: z.string().optional().describe('New body (optional)'),
+};
+
+/** project_manage_labels input schema */
+export const manageLabelsSchema = {
+  ...repoParam,
+  issueNumber: z.number().int().positive().describe('Issue number'),
+  addLabels: z.array(z.string()).optional().describe('Labels to add'),
+  removeLabels: z.array(z.string()).optional().describe('Labels to remove'),
+};
+
+/** project_manage_assignees input schema */
+export const manageAssigneesSchema = {
+  ...repoParam,
+  issueNumber: z.number().int().positive().describe('Issue number'),
+  addAssignees: z.array(z.string()).optional().describe('GitHub usernames to assign'),
+  removeAssignees: z.array(z.string()).optional().describe('GitHub usernames to unassign'),
+};
+
+/** project_set_issue_state input schema */
+export const setIssueStateSchema = {
+  ...repoParam,
+  issueNumber: z.number().int().positive().describe('Issue number'),
+  state: z.enum(['open', 'closed']).describe('Target state'),
+  reason: z
+    .enum(['completed', 'not_planned'])
+    .optional()
+    .describe("Close reason (only for state='closed')"),
 };

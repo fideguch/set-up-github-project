@@ -30,5 +30,8 @@ jobs:
       - name: ShellCheck
         run: shellcheck scripts/*.sh
 
+      - name: Security Audit
+        run: npm audit --audit-level=high
+
       - name: Test
         run: npm test
