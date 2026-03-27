@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 
 function fileExists(relativePath: string): boolean {
@@ -1434,5 +1437,105 @@ test.describe('PM Assistant Redesign Validation', () => {
   test('install.sh uses new skill directory name', () => {
     const content = readFile('install.sh');
     expect(content).toContain('github-project-manager');
+  });
+});
+
+// ============================================================
+// MCP Server Structure Validation
+// ============================================================
+test.describe('MCP Server Structure Validation', () => {
+  test('src/ directory exists', () => {
+    expect(fileExists('src')).toBe(true);
+  });
+
+  test('src/index.ts entry point exists', () => {
+    expect(fileExists('src/index.ts')).toBe(true);
+  });
+
+  test('src/server.ts factory exists', () => {
+    expect(fileExists('src/server.ts')).toBe(true);
+  });
+
+  test('src/graphql/ directory has client, queries, and mutations', () => {
+    expect(fileExists('src/graphql/client.ts')).toBe(true);
+    expect(fileExists('src/graphql/queries.ts')).toBe(true);
+    expect(fileExists('src/graphql/mutations.ts')).toBe(true);
+  });
+
+  test('src/tools/ has all 6 tool files', () => {
+    expect(fileExists('src/tools/index.ts')).toBe(true);
+    expect(fileExists('src/tools/list-fields.ts')).toBe(true);
+    expect(fileExists('src/tools/list-items.ts')).toBe(true);
+    expect(fileExists('src/tools/add-item.ts')).toBe(true);
+    expect(fileExists('src/tools/move-status.ts')).toBe(true);
+    expect(fileExists('src/tools/set-priority.ts')).toBe(true);
+    expect(fileExists('src/tools/sprint-report.ts')).toBe(true);
+  });
+
+  test('src/schemas/index.ts has all schema exports', () => {
+    const content = readFile('src/schemas/index.ts');
+    expect(content).toContain('addItemSchema');
+    expect(content).toContain('moveStatusSchema');
+    expect(content).toContain('setPrioritySchema');
+    expect(content).toContain('listItemsSchema');
+    expect(content).toContain('listFieldsSchema');
+    expect(content).toContain('sprintReportSchema');
+  });
+
+  test('src/types/index.ts has core type exports', () => {
+    const content = readFile('src/types/index.ts');
+    expect(content).toContain('ProjectItem');
+    expect(content).toContain('ProjectField');
+    expect(content).toContain('SprintReport');
+  });
+
+  test('package.json has MCP dependencies', () => {
+    const pkg = JSON.parse(readFile('package.json'));
+    expect(pkg.dependencies).toHaveProperty('@modelcontextprotocol/sdk');
+    expect(pkg.dependencies).toHaveProperty('@octokit/graphql');
+    expect(pkg.dependencies).toHaveProperty('zod');
+  });
+
+  test('package.json has bin entry', () => {
+    const pkg = JSON.parse(readFile('package.json'));
+    expect(pkg.bin).toHaveProperty('github-project-manager');
+  });
+
+  test('package.json has build script', () => {
+    const pkg = JSON.parse(readFile('package.json'));
+    expect(pkg.scripts.build).toBeDefined();
+  });
+
+  test('tsconfig.build.json exists', () => {
+    expect(fileExists('tsconfig.build.json')).toBe(true);
+  });
+
+  test('src/index.ts has shebang for CLI execution', () => {
+    const content = readFile('src/index.ts');
+    expect(content).toMatch(/^#!\/usr\/bin\/env node/);
+  });
+
+  test('src/tools/index.ts registers all 6 tools', () => {
+    const content = readFile('src/tools/index.ts');
+    expect(content).toContain('project_list_fields');
+    expect(content).toContain('project_list_items');
+    expect(content).toContain('project_add_item');
+    expect(content).toContain('project_move_status');
+    expect(content).toContain('project_set_priority');
+    expect(content).toContain('project_sprint_report');
+  });
+
+  test('GraphQL queries contain required operations', () => {
+    const queries = readFile('src/graphql/queries.ts');
+    expect(queries).toContain('GetProjectId');
+    expect(queries).toContain('GetProjectFields');
+    expect(queries).toContain('GetProjectItems');
+    expect(queries).toContain('GetProjectFull');
+  });
+
+  test('GraphQL mutations contain required operations', () => {
+    const mutations = readFile('src/graphql/mutations.ts');
+    expect(mutations).toContain('AddProjectItem');
+    expect(mutations).toContain('UpdateItemField');
   });
 });

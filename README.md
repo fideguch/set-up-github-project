@@ -103,6 +103,41 @@ Claude Code または Devin で以下のように起動:
 | `migrate-import.sh`  | A      | Jira/Linear/Notion CSV 移行                |
 | `sprint-report.sh`   | C      | Sprint レポート（ベロシティ・完了率）      |
 
+## MCP Server
+
+AI エージェント（Claude Code, GitHub Copilot 等）から MCP 経由でプロジェクト操作を実行できます。
+
+### セットアップ
+
+```bash
+npm install && npm run build
+```
+
+Claude Desktop の設定 (`~/.claude/settings.json` または MCP 設定):
+
+```json
+{
+  "mcpServers": {
+    "github-project-manager": {
+      "command": "node",
+      "args": ["/path/to/my_pm_tools/dist/index.js"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}
+```
+
+### MCP ツール一覧
+
+| ツール                  | 説明                                          |
+| ----------------------- | --------------------------------------------- |
+| `project_list_fields`   | フィールド・オプション一覧                    |
+| `project_list_items`    | アイテム一覧（ステータス/優先度フィルタ対応） |
+| `project_add_item`      | Issue/PR をプロジェクトに追加                 |
+| `project_move_status`   | ステータス変更                                |
+| `project_set_priority`  | 優先度設定（P0-P4）                           |
+| `project_sprint_report` | Sprint レポート生成                           |
+
 ## 連携スキル
 
 | スキル                        | 説明                                         |
@@ -126,7 +161,8 @@ Claude Code または Devin で以下のように起動:
 
 ```bash
 npm install
-npm test            # リグレッションテスト (231件)
+npm test            # リグレッションテスト (293件)
+npm run build       # MCP Server ビルド
 npm run quality     # lint + typecheck + format:check
 ```
 

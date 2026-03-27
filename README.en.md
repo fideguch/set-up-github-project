@@ -92,6 +92,41 @@ Invoke in Claude Code or Devin:
 | `migrate-import.sh`  | A    | Jira/Linear/Notion CSV import              |
 | `sprint-report.sh`   | C    | Sprint report (velocity, completion)       |
 
+## MCP Server
+
+AI agents (Claude Code, GitHub Copilot, etc.) can operate projects via MCP protocol.
+
+### Setup
+
+```bash
+npm install && npm run build
+```
+
+Add to Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "github-project-manager": {
+      "command": "node",
+      "args": ["/path/to/my_pm_tools/dist/index.js"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}
+```
+
+### MCP Tools
+
+| Tool                    | Description                            |
+| ----------------------- | -------------------------------------- |
+| `project_list_fields`   | List fields and their options          |
+| `project_list_items`    | List items with status/priority filter |
+| `project_add_item`      | Add an Issue or PR to the project      |
+| `project_move_status`   | Change item status                     |
+| `project_set_priority`  | Set priority (P0-P4)                   |
+| `project_sprint_report` | Generate sprint report                 |
+
 ## Documentation
 
 - **[Operation Guide (USAGE.md)](docs/USAGE.md)** — Daily ops, views, Sprint, migration, FAQ
@@ -103,7 +138,8 @@ Invoke in Claude Code or Devin:
 
 ```bash
 npm install
-npm test            # 231 regression tests
+npm test            # 293 regression tests
+npm run build       # Build MCP server
 npm run quality     # lint + typecheck + format:check
 ```
 

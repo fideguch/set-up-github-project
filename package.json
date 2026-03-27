@@ -2,7 +2,12 @@
   "name": "my-pm-tools",
   "version": "1.0.0",
   "description": "GitHub Projects V2 の開発環境を一括構築する Devin プレイブック＆スキル集",
+  "type": "module",
+  "bin": {
+    "github-project-manager": "dist/index.js"
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -36,5 +41,10 @@
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "@octokit/graphql": "^9.0.3",
+    "zod": "^4.3.6"
   }
 }
