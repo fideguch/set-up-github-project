@@ -60,7 +60,7 @@ echo "ドライラン: $DRY_RUN"
 echo ""
 
 # Python script for CSV parsing and import
-python3 << 'PYTHON_SCRIPT' "$REPO" "$NUMBER" "$CSV_FILE" "$FORMAT" "$DRY_RUN" "$OWNER" "$LITE"
+python3 << 'PYTHON_SCRIPT' "$REPO" "$NUMBER" "$CSV_FILE" "$FORMAT" "$DRY_RUN" "$OWNER" "$LITE" "$SCRIPT_DIR"
 import csv
 import subprocess
 import sys
@@ -74,6 +74,8 @@ FORMAT = sys.argv[4]
 DRY_RUN = sys.argv[5] == "true"
 OWNER = sys.argv[6]
 LITE = sys.argv[7] == "true" if len(sys.argv) > 7 else False
+SCRIPT_DIR = sys.argv[8] if len(sys.argv) > 8 else "."
+PROJECT_OPS = f"{SCRIPT_DIR}/project-ops.sh"
 
 # Status mapping tables
 JIRA_STATUS_MAP = {
@@ -331,14 +333,15 @@ for i, item in enumerate(items):
                 # Set priority if available
                 if item.get("priority"):
                     subprocess.run(
-                        ["bash", f"{sys.path[0]}/../scripts/project-ops.sh" if False else "./scripts/project-ops.sh",
+                        ["bash", PROJECT_OPS,
                          OWNER, NUMBER, "set-priority", item_id, item["priority"]],
                         capture_output=True
                     )
                 # Set status if not default
-                if item.get("status") and item["status"] != "進行待ち":
+                default_status = "Backlog" if LITE else "進行待ち"
+                if item.get("status") and item["status"] != default_status:
                     subprocess.run(
-                        ["bash", "./scripts/project-ops.sh",
+                        ["bash", PROJECT_OPS,
                          OWNER, NUMBER, "move", item_id, item["status"]],
                         capture_output=True
                     )
