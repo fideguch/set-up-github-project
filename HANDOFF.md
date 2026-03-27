@@ -83,3 +83,30 @@
 | メモリファイル | 11 (ADR 6 + 管理 5)           |
 | テスト実行時間 | 2.6 秒                        |
 | 世界評価スコア | 3.53/5.00 (20ツール中11位)    |
+
+## 次のセッションでやること
+
+### 最優先: MCP Server 実装の計画策定（P05-P08）
+
+ユーザーが明確に要望した「多様な接続ができるようにしたい」を実現する。
+
+**対象接続先:**
+
+1. **Slack** — Sprint レポートやブロッカー通知をチャンネルに送信
+2. **Google Workspace** — Calendar（Sprint 日程）、Sheets（メトリクス蓄積）、Docs（Sprint 振り返り）
+3. **Cloud Copilot 系** — GitHub Copilot / Claude Code / 他の AI エージェントから MCP 経由で操作
+4. **GitHub MCP Server** — 公式 GitHub MCP（2026-01 GA）との連携・補完
+
+**進め方:**
+
+1. `memory/north-star.md` を読み、Mission との整合を確認
+2. `memory/DECISION-LOG.md` の P05-P08 を確認
+3. `/mcp-server-patterns` スキルで最新の MCP SDK ドキュメントを取得
+4. `/plan` モードで MCP Server の設計・実装計画を策定
+5. 計画承認後、worktree で実装開始
+
+**参考:**
+
+- 現在のスコア: 3.53/5.00 → MCP 実装後の目標: 3.83+
+- `mcp-server-patterns` スキルを活用（Node/TypeScript SDK, Zod validation, stdio vs Streamable HTTP）
+- 既存スクリプト (project-ops.sh, sprint-report.sh) の機能を MCP tools として公開する設計
