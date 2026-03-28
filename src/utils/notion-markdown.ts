@@ -6,13 +6,7 @@
  * instead of bare `as` casts, per codebase-integrity §1.5.
  */
 import type { NotionRichText, NotionBlock } from '../types/notion.js';
-
-// --- Runtime Narrowing Helpers (P5: type safety without `as` casts) ---
-
-/** Validate a value is a non-null object (not array). */
-function isRecord(val: unknown): val is Record<string, unknown> {
-  return val != null && typeof val === 'object' && !Array.isArray(val);
-}
+import { isRecord } from './type-guards.js';
 
 /** Extract rich_text array from a block's type-named payload. */
 function getBlockRichText(block: NotionBlock): readonly NotionRichText[] {

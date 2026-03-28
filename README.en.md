@@ -186,7 +186,7 @@ Resolution order: exact match → alias match → partial match (case-insensitiv
 
 ```bash
 npm install
-npm test            # 375+ regression tests
+npm test            # 476 regression tests
 npm run build       # Build MCP server
 npm run quality     # lint + typecheck + format:check
 ```

@@ -48,22 +48,30 @@ function notionHeaders(token: string): Record<string, string> {
   };
 }
 
+/** Options for notionFetch — avoids RequestInit `as` casts. */
+interface NotionFetchOptions {
+  readonly method?: string;
+  readonly body?: string;
+}
+
 /**
  * Fetch with automatic retry on 429 (rate limit).
  * Reads Retry-After header for backoff duration.
+ * Returns parsed JSON validated as a non-null object.
  */
-async function notionFetch(
+async function notionFetch<T>(
   url: string,
   token: string,
-  options: RequestInit = {}
-): Promise<unknown> {
+  options: NotionFetchOptions = {}
+): Promise<T> {
   const headers = notionHeaders(token);
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const res = await fetch(url, {
-      ...options,
-      headers: { ...headers, ...(options.headers as Record<string, string>) },
+      method: options.method,
+      body: options.body,
+      headers,
     });
 
     if (res.status === 429) {
@@ -77,13 +85,21 @@ async function notionFetch(
     }
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+      const errorBody: unknown = await res.json().catch(() => ({}));
+      const body =
+        errorBody != null && typeof errorBody === 'object'
+          ? (errorBody as Record<string, unknown>)
+          : {};
       const code = typeof body['code'] === 'string' ? body['code'] : '';
       const msg = typeof body['message'] === 'string' ? body['message'] : res.statusText;
       throw new Error(`Notion API error ${res.status}: ${code} - ${msg}`);
     }
 
-    return res.json();
+    const data: unknown = await res.json();
+    if (data == null || typeof data !== 'object') {
+      throw new Error('Notion API returned non-object response.');
+    }
+    return data as T;
   }
 
   throw lastError ?? new Error('Notion API request failed.');
@@ -96,47 +112,51 @@ async function notionFetch(
 export function createNotionClient(token: string): NotionClient {
   return {
     search: async (params) => {
-      return (await notionFetch(`${BASE_URL}/search`, token, {
+      return notionFetch<NotionSearchResponse>(`${BASE_URL}/search`, token, {
         method: 'POST',
         body: JSON.stringify(params),
-      })) as NotionSearchResponse;
+      });
     },
 
     getPage: async (pageId) => {
-      return (await notionFetch(`${BASE_URL}/pages/${pageId}`, token, {
+      return notionFetch<NotionPageResponse>(`${BASE_URL}/pages/${pageId}`, token, {
         method: 'GET',
-      })) as NotionPageResponse;
+      });
     },
 
     getBlockChildren: async (blockId, cursor) => {
       const params = new URLSearchParams({ page_size: '100' });
       if (cursor) params.set('start_cursor', cursor);
-      return (await notionFetch(
+      return notionFetch<NotionBlockChildrenResponse>(
         `${BASE_URL}/blocks/${blockId}/children?${params.toString()}`,
         token,
         { method: 'GET' }
-      )) as NotionBlockChildrenResponse;
+      );
     },
 
     queryDatabase: async (dbId, params) => {
-      return (await notionFetch(`${BASE_URL}/databases/${dbId}/query`, token, {
+      return notionFetch<NotionQueryResponse>(`${BASE_URL}/databases/${dbId}/query`, token, {
         method: 'POST',
         body: JSON.stringify(params),
-      })) as NotionQueryResponse;
+      });
     },
 
     createPage: async (params) => {
-      return (await notionFetch(`${BASE_URL}/pages`, token, {
+      return notionFetch<NotionPageResponse>(`${BASE_URL}/pages`, token, {
         method: 'POST',
         body: JSON.stringify(params),
-      })) as NotionPageResponse;
+      });
     },
 
     appendBlocks: async (blockId, children) => {
-      return (await notionFetch(`${BASE_URL}/blocks/${blockId}/children`, token, {
-        method: 'PATCH',
-        body: JSON.stringify({ children }),
-      })) as NotionBlockChildrenResponse;
+      return notionFetch<NotionBlockChildrenResponse>(
+        `${BASE_URL}/blocks/${blockId}/children`,
+        token,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ children }),
+        }
+      );
     },
   };
 }

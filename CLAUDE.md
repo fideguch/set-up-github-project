@@ -53,9 +53,9 @@ github-project-manager/
 │   ├── schemas/                 # Zod input schemas
 │   └── types/                   # TypeScript type definitions
 ├── templates/                   # Files to copy into TARGET repos
-├── skills/                      # 5 reusable sub-skills + workspace-bridge
+├── skills/                      # 8 reusable sub-skills
 ├── docs/                        # Detailed documentation
-├── tests/                       # 457+ Playwright regression tests
+├── tests/                       # 476 Playwright regression tests
 │   ├── skill/                   # Skill validation (3 files: structure, content, validation)
 │   ├── mcp/                     # MCP tool/schema/server tests (72+ workspace tests)
 │   └── scenarios/               # Scenario tests (47+ tests, incl. PM + cross-service workflows)
@@ -67,7 +67,7 @@ github-project-manager/
 - Skill definition: Markdown (SKILL.md, 3-mode architecture)
 - MCP Server: TypeScript + @modelcontextprotocol/sdk + @octokit/graphql + Zod
 - Automation: Shell scripts (bash, gh CLI, GraphQL) — 9 scripts, 1,498 lines
-- Tests: Playwright + TypeScript (strict mode) — 375+ tests
+- Tests: Playwright + TypeScript (strict mode) — 476 tests
 - Code quality: ESLint + Prettier + Husky + lint-staged
 - CI: GitHub Actions (lint, typecheck, format:check, shellcheck, test)
 
@@ -95,7 +95,7 @@ npm run quality && npm test
 ## Key Commands
 
 ```bash
-npm test                          # Run 375+ regression tests
+npm test                          # Run 476 regression tests
 npm run quality                   # lint + typecheck + format:check
 npm run build                     # Build MCP server to dist/
 npm run format                    # Auto-format all files

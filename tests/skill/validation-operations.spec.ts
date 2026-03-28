@@ -65,9 +65,9 @@ test.describe('Sync Rule Validation', () => {
     expect(skill).toContain('P4');
   });
 
-  test('view count is consistent: README says 6', () => {
+  test('view count is consistent: README says 5', () => {
     const readme = readFile('README.md');
-    expect(readme).toContain('6種');
+    expect(readme).toContain('5種');
   });
 
   test('workflow count is consistent in automation guide', () => {

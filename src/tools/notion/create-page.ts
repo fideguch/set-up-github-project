@@ -1,11 +1,7 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
 import { textToParagraphBlocks } from '../../utils/notion-blocks.js';
-
-/** Validate a value is a non-null object (not array). */
-function isRecord(val: unknown): val is Record<string, unknown> {
-  return val != null && typeof val === 'object' && !Array.isArray(val);
-}
+import { isRecord } from '../../utils/type-guards.js';
 
 /**
  * Create a new Notion page under a database or another page.

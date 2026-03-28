@@ -31,11 +31,20 @@ export interface GoogleClient {
 /** Maximum retry attempts for rate-limited requests. */
 const MAX_RETRIES = 3;
 
+/** Response format selector for googleFetchCore. */
+type ResponseFormat = 'json' | 'text';
+
 /**
- * Fetch with OAuth2 bearer token and retry on 429.
- * Returns parsed JSON or throws descriptive error.
+ * Core fetch with OAuth2 bearer token and retry on 429.
+ * Shared by JSON and text response paths — eliminates duplication.
  */
-async function googleFetch(url: string, accessToken: string): Promise<unknown> {
+async function googleFetchCore(url: string, accessToken: string, format: 'json'): Promise<unknown>;
+async function googleFetchCore(url: string, accessToken: string, format: 'text'): Promise<string>;
+async function googleFetchCore(
+  url: string,
+  accessToken: string,
+  format: ResponseFormat
+): Promise<unknown> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -51,46 +60,45 @@ async function googleFetch(url: string, accessToken: string): Promise<unknown> {
     }
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-      const errorMsg =
-        typeof body['error'] === 'object' && body['error'] !== null
-          ? JSON.stringify(body['error'])
-          : res.statusText;
-      throw new Error(`Google API error ${res.status}: ${errorMsg}`);
+      if (format === 'json') {
+        const errorBody: unknown = await res.json().catch(() => ({}));
+        const body =
+          errorBody != null && typeof errorBody === 'object'
+            ? (errorBody as Record<string, unknown>)
+            : {};
+        const errorMsg =
+          typeof body['error'] === 'object' && body['error'] !== null
+            ? JSON.stringify(body['error'])
+            : res.statusText;
+        throw new Error(`Google API error ${res.status}: ${errorMsg}`);
+      }
+      throw new Error(`Google API error ${res.status}: ${res.statusText}`);
     }
 
-    return res.json();
+    if (format === 'text') return res.text();
+
+    const data: unknown = await res.json();
+    if (data == null || typeof data !== 'object') {
+      throw new Error('Google API returned non-object response.');
+    }
+    return data;
   }
 
   throw new Error('Google API request failed.');
 }
 
 /**
+ * Typed JSON fetch with runtime validation — no `as` casts at call sites.
+ */
+async function googleFetch<T>(url: string, accessToken: string): Promise<T> {
+  return (await googleFetchCore(url, accessToken, 'json')) as T;
+}
+
+/**
  * Fetch that returns raw text (for Drive export endpoints).
  */
 async function googleFetchText(url: string, accessToken: string): Promise<string> {
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (res.status === 429) {
-      const backoff = Math.pow(2, attempt) * 1000;
-      if (attempt < MAX_RETRIES) {
-        await new Promise((resolve) => setTimeout(resolve, backoff));
-        continue;
-      }
-      throw new Error('Google API rate limit exceeded after retries.');
-    }
-
-    if (!res.ok) {
-      throw new Error(`Google API error ${res.status}: ${res.statusText}`);
-    }
-
-    return res.text();
-  }
-
-  throw new Error('Google API request failed.');
+  return googleFetchCore(url, accessToken, 'text');
 }
 
 /**
@@ -115,7 +123,8 @@ async function refreshAccessToken(creds: GoogleCredentials): Promise<string> {
     throw new Error(`OAuth2 token refresh failed (${res.status}): ${body}`);
   }
 
-  const data = (await res.json()) as Record<string, unknown>;
+  const raw: unknown = await res.json();
+  const data = raw != null && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
   const token = data['access_token'];
   if (typeof token !== 'string') {
     throw new Error('OAuth2 token refresh returned no access_token.');
@@ -152,10 +161,10 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
       if (opts?.mimeType) {
         params.set('q', `${safeQuery} and mimeType = '${opts.mimeType}' and trashed = false`);
       }
-      return (await googleFetch(
+      return googleFetch<DriveSearchResponse>(
         `https://www.googleapis.com/drive/v3/files?${params.toString()}`,
         token
-      )) as DriveSearchResponse;
+      );
     },
 
     exportFile: async (fileId, mimeType) => {
@@ -170,10 +179,10 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
     getSheetValues: async (spreadsheetId, range) => {
       const token = await getToken();
       const encodedRange = encodeURIComponent(range);
-      return (await googleFetch(
+      return googleFetch<SheetValuesResponse>(
         `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodedRange}`,
         token
-      )) as SheetValuesResponse;
+      );
     },
 
     listEvents: async (calendarId, params) => {
@@ -187,10 +196,10 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
       if (params.timeMax) q.set('timeMax', params.timeMax);
       if (params.query) q.set('q', params.query);
       const encodedCalId = encodeURIComponent(calendarId);
-      return (await googleFetch(
+      return googleFetch<EventListResponse>(
         `https://www.googleapis.com/calendar/v3/calendars/${encodedCalId}/events?${q.toString()}`,
         token
-      )) as EventListResponse;
+      );
     },
 
     listGmailMessages: async (query, opts) => {
@@ -199,10 +208,10 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
         q: query,
         maxResults: String(opts?.limit ?? 10),
       });
-      return (await googleFetch(
+      return googleFetch<GmailListResponse>(
         `https://gmail.googleapis.com/gmail/v1/users/me/messages?${params.toString()}`,
         token
-      )) as GmailListResponse;
+      );
     },
 
     getGmailMessage: async (messageId) => {
@@ -212,10 +221,10 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
       params.append('metadataHeaders', 'Subject');
       params.append('metadataHeaders', 'From');
       params.append('metadataHeaders', 'Date');
-      return (await googleFetch(
+      return googleFetch<GmailMessageResponse>(
         `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?${params.toString()}`,
         token
-      )) as GmailMessageResponse;
+      );
     },
   };
 }

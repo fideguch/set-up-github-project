@@ -15,9 +15,12 @@ function formatRow(page: NotionPage): {
   };
 }
 
+/** Maximum number of pagination requests to prevent runaway loops. */
+const MAX_PAGES = 10;
+
 /**
  * Query a Notion database with optional filter and sort.
- * P1: NotionClient DI, P2: never throws, P4: JSON envelope response.
+ * P1: NotionClient DI, P2: never throws, P3: paginated, P4: JSON envelope response.
  */
 export async function notionQueryDatabase(
   notion: NotionClient,
@@ -77,13 +80,27 @@ export async function notionQueryDatabase(
   }
 
   try {
-    const response = await notion.queryDatabase(args.databaseId, {
-      filter: parsedFilter,
-      sorts: parsedSorts,
-      page_size: args.pageSize,
-    });
+    const allResults: ReturnType<typeof formatRow>[] = [];
+    let cursor: string | undefined;
+    let hasMore = true;
+    let pagesFetched = 0;
 
-    const results = response.results.map(formatRow);
+    while (hasMore && pagesFetched < MAX_PAGES) {
+      const response = await notion.queryDatabase(args.databaseId, {
+        filter: parsedFilter,
+        sorts: parsedSorts,
+        page_size: args.pageSize,
+        start_cursor: cursor,
+      });
+      pagesFetched++;
+
+      for (const page of response.results) {
+        allResults.push(formatRow(page));
+      }
+
+      hasMore = response.has_more;
+      cursor = response.next_cursor ?? undefined;
+    }
 
     return {
       content: [
@@ -91,9 +108,10 @@ export async function notionQueryDatabase(
           type: 'text',
           text: JSON.stringify(
             {
-              results,
-              totalResults: results.length,
-              hasMore: response.has_more,
+              results: allResults,
+              totalResults: allResults.length,
+              hasMore,
+              pagesFetched,
             },
             null,
             2

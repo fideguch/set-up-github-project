@@ -163,13 +163,16 @@ test.describe('Cross-Reference Validation', () => {
     expect(readme).toContain('setup-views.sh');
   });
 
-  test('README lists all 5 sub-skills', () => {
+  test('README lists all 8 sub-skills', () => {
     const readme = readFile('README.md');
     expect(readme).toContain('code-quality');
     expect(readme).toContain('ci-cd-pipeline');
     expect(readme).toContain('typescript-best-practices');
     expect(readme).toContain('git-workflow');
     expect(readme).toContain('project-setup-automation');
+    expect(readme).toContain('workspace-bridge');
+    expect(readme).toContain('pm-figjam-diagrams');
+    expect(readme).toContain('speckit-bridge');
   });
 
   test('CONTRIBUTING.md has all 13 labels', () => {

@@ -1,11 +1,7 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
 import type { NotionPage } from '../../types/notion.js';
-
-/** Validate a value is a non-null object (not array). */
-function isRecord(val: unknown): val is Record<string, unknown> {
-  return val != null && typeof val === 'object' && !Array.isArray(val);
-}
+import { isRecord } from '../../utils/type-guards.js';
 
 /** Extract a plain-text title from Notion page properties. */
 function extractTitle(properties: Record<string, unknown>): string {

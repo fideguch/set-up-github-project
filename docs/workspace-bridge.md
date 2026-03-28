@@ -96,8 +96,14 @@ Notion ワークスペース内のページとデータベースを検索。
 
 ```
 ユーザー: 「NotionのDBからステータスが完了のものを取得して」
-→ notion_query_database { databaseId: "...", filter: { property: "Status", status: { equals: "完了" } } }
+→ notion_query_database {
+    databaseId: "...",
+    filter: "{\"property\": \"Status\", \"status\": {\"equals\": \"完了\"}}"
+  }
 ```
+
+`filter` と `sorts` は JSON 文字列として渡します（Notion filter/sort 構文に準拠）。
+カーソルベースのページネーションにより、自動的に最大 10 ページまで結果を取得します。
 
 #### `notion_create_page`
 
@@ -105,8 +111,15 @@ Notion ワークスペース内のページとデータベースを検索。
 
 ```
 ユーザー: 「Notionにスプリント振り返りを書き出して」
-→ notion_create_page { parentId: "...", title: "Sprint 5 振り返り", content: "..." }
+→ notion_create_page {
+    parentId: "...",
+    parentType: "database",
+    properties: "{\"Name\": {\"title\": [{\"text\": {\"content\": \"Sprint 5 振り返り\"}}]}}",
+    content: "振り返り内容をここに記載..."
+  }
 ```
+
+`properties` は Notion プロパティ形式の JSON 文字列です。`content` はオプションで、プレーンテキストが段落ブロックとして追加されます。
 
 #### `notion_append_blocks`
 
@@ -114,8 +127,13 @@ Notion ワークスペース内のページとデータベースを検索。
 
 ```
 ユーザー: 「Notionのページに議事録を追記して」
-→ notion_append_blocks { pageId: "...", blocks: [...] }
+→ notion_append_blocks {
+    blockId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    content: "追記したいテキスト内容"
+  }
 ```
+
+`blockId` はページ ID またはブロック ID です。`content` はプレーンテキストで、段落ブロックとして追加されます。
 
 ### Google Workspace ツール（6種）
 

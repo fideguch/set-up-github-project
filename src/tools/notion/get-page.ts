@@ -2,11 +2,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
 import type { NotionBlock } from '../../types/notion.js';
 import { notionBlocksToMarkdown } from '../../utils/notion-markdown.js';
-
-/** Validate a value is a non-null object (not array). */
-function isRecord(val: unknown): val is Record<string, unknown> {
-  return val != null && typeof val === 'object' && !Array.isArray(val);
-}
+import { isRecord } from '../../utils/type-guards.js';
 
 /** Maximum number of pagination requests to prevent runaway loops. */
 const MAX_PAGES = 10;
