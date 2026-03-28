@@ -2,20 +2,24 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
 import type { NotionPage } from '../../types/notion.js';
 
+/** Validate a value is a non-null object (not array). */
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return val != null && typeof val === 'object' && !Array.isArray(val);
+}
+
 /** Extract a plain-text title from Notion page properties. */
 function extractTitle(properties: Record<string, unknown>): string {
   for (const value of Object.values(properties)) {
-    if (
-      value != null &&
-      typeof value === 'object' &&
-      'title' in value &&
-      Array.isArray((value as Record<string, unknown>)['title'])
-    ) {
-      const titleArr = (value as Record<string, unknown>)['title'] as readonly {
-        readonly plain_text: string;
-      }[];
-      return titleArr.map((t) => t.plain_text).join('');
-    }
+    if (!isRecord(value)) continue;
+    if (!('title' in value)) continue;
+    const titleArr: unknown = value['title'];
+    if (!Array.isArray(titleArr)) continue;
+    return titleArr
+      .filter(
+        (t): t is Record<string, unknown> => isRecord(t) && typeof t['plain_text'] === 'string'
+      )
+      .map((t) => String(t['plain_text']))
+      .join('');
   }
   return '';
 }

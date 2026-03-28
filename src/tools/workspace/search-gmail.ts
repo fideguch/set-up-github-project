@@ -27,16 +27,21 @@ export async function workspaceSearchGmail(
       limit: args.limit,
     });
 
-    const messageIds = (listResponse.messages ?? []).map((m) => m.id);
-    const details = await Promise.all(messageIds.map((id) => google.getGmailMessage(id)));
-
-    const messages = details.map((msg) => ({
-      id: msg.id,
-      subject: extractHeader(msg, 'Subject'),
-      from: extractHeader(msg, 'From'),
-      date: extractHeader(msg, 'Date'),
-      snippet: msg.snippet,
-    }));
+    const messages = [];
+    for (const msg of (listResponse.messages ?? []).slice(0, args.limit)) {
+      try {
+        const detail = await google.getGmailMessage(msg.id);
+        messages.push({
+          id: detail.id,
+          subject: extractHeader(detail, 'Subject'),
+          from: extractHeader(detail, 'From'),
+          date: extractHeader(detail, 'Date'),
+          snippet: detail.snippet,
+        });
+      } catch {
+        /* skip failed individual message fetch */
+      }
+    }
 
     return {
       content: [

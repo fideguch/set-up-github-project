@@ -46,16 +46,19 @@ github-project-manager/
 │   ├── index.ts                 # Entry point (stdio transport)
 │   ├── server.ts                # Server factory
 │   ├── graphql/                 # GraphQL client, queries, mutations
-│   ├── tools/                   # 22 MCP tools (11 GitHub + 5 Notion + 6 Google Workspace)
+│   ├── tools/                   # 22 MCP tools
+│   │   ├── notion/              # Notion API tools (5: search, get-page, query-db, create-page, append-blocks)
+│   │   ├── workspace/           # Google Workspace tools (6: drive, docs, sheets, slides, calendar, gmail)
+│   │   └── *.ts                 # GitHub Project tools (11: list-fields, list-items, add-item, etc.)
 │   ├── schemas/                 # Zod input schemas
 │   └── types/                   # TypeScript type definitions
 ├── templates/                   # Files to copy into TARGET repos
 ├── skills/                      # 5 reusable sub-skills + workspace-bridge
 ├── docs/                        # Detailed documentation
-├── tests/                       # 375+ Playwright regression tests
+├── tests/                       # 457+ Playwright regression tests
 │   ├── skill/                   # Skill validation (3 files: structure, content, validation)
-│   ├── mcp/                     # MCP tool/schema/server tests (67+ tests)
-│   └── scenarios/               # Scenario tests (35 tests, incl. PM workflows)
+│   ├── mcp/                     # MCP tool/schema/server tests (72+ workspace tests)
+│   └── scenarios/               # Scenario tests (47+ tests, incl. PM + cross-service workflows)
 └── .github/                     # CI/CD for THIS repo
 ```
 

@@ -143,13 +143,14 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
   return {
     searchDrive: async (query, opts) => {
       const token = await getToken();
+      const safeQuery = query.replace(/'/g, "\\'");
       const params = new URLSearchParams({
-        q: `${query} and trashed = false`,
+        q: `${safeQuery} and trashed = false`,
         pageSize: String(opts?.limit ?? 20),
         fields: 'files(id,name,mimeType,webViewLink,modifiedTime),nextPageToken',
       });
       if (opts?.mimeType) {
-        params.set('q', `${query} and mimeType = '${opts.mimeType}' and trashed = false`);
+        params.set('q', `${safeQuery} and mimeType = '${opts.mimeType}' and trashed = false`);
       }
       return (await googleFetch(
         `https://www.googleapis.com/drive/v3/files?${params.toString()}`,

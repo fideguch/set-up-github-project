@@ -1,16 +1,6 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
-import type { NotionBlockInput } from '../../types/notion.js';
-
-/** Convert plain text to paragraph block inputs (split by double newline). */
-function textToParagraphBlocks(text: string): readonly NotionBlockInput[] {
-  return text.split('\n\n').map((paragraph) => ({
-    type: 'paragraph',
-    paragraph: {
-      rich_text: [{ type: 'text', text: { content: paragraph } }],
-    },
-  }));
-}
+import { textToParagraphBlocks } from '../../utils/notion-blocks.js';
 
 /**
  * Append paragraph blocks to a Notion page or block.

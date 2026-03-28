@@ -1,15 +1,10 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { NotionClient } from '../../utils/notion-client.js';
-import type { NotionBlockInput } from '../../types/notion.js';
+import { textToParagraphBlocks } from '../../utils/notion-blocks.js';
 
-/** Convert plain text lines into paragraph block inputs. */
-function textToParagraphBlocks(text: string): readonly NotionBlockInput[] {
-  return text.split('\n\n').map((paragraph) => ({
-    type: 'paragraph',
-    paragraph: {
-      rich_text: [{ type: 'text', text: { content: paragraph } }],
-    },
-  }));
+/** Validate a value is a non-null object (not array). */
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return val != null && typeof val === 'object' && !Array.isArray(val);
 }
 
 /**
@@ -29,11 +24,26 @@ export async function notionCreatePage(
     const parent =
       args.parentType === 'database' ? { database_id: args.parentId } : { page_id: args.parentId };
 
-    const properties = JSON.parse(args.properties) as Record<string, unknown>;
+    let properties: Record<string, unknown>;
+    try {
+      const parsed: unknown = JSON.parse(args.properties);
+      if (!isRecord(parsed)) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'properties must be a JSON object.' }],
+        };
+      }
+      properties = parsed;
+    } catch {
+      return {
+        isError: true,
+        content: [
+          { type: 'text', text: `Invalid properties JSON: ${args.properties.slice(0, 100)}` },
+        ],
+      };
+    }
 
-    const children: readonly NotionBlockInput[] | undefined = args.content
-      ? textToParagraphBlocks(args.content)
-      : undefined;
+    const children = args.content ? textToParagraphBlocks(args.content) : undefined;
 
     const page = await notion.createPage({
       parent,

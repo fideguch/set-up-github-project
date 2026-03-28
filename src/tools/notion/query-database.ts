@@ -62,7 +62,7 @@ export async function notionQueryDatabase(
           ],
         };
       }
-      parsedSorts = parsed as readonly unknown[];
+      parsedSorts = Array.from(parsed) as readonly unknown[];
     } catch {
       return {
         isError: true,

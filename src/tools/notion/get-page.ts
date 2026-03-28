@@ -3,6 +3,11 @@ import type { NotionClient } from '../../utils/notion-client.js';
 import type { NotionBlock } from '../../types/notion.js';
 import { notionBlocksToMarkdown } from '../../utils/notion-markdown.js';
 
+/** Validate a value is a non-null object (not array). */
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return val != null && typeof val === 'object' && !Array.isArray(val);
+}
+
 /** Maximum number of pagination requests to prevent runaway loops. */
 const MAX_PAGES = 10;
 
@@ -71,14 +76,20 @@ export async function notionGetPage(
     // Fetch page metadata
     const page = await notion.getPage(args.pageId);
 
-    // Extract title from page properties
+    // Extract title from page properties (isRecord narrowing — no `as` casts)
     let title = '';
     for (const prop of Object.values(page.properties)) {
-      const p = prop as { type?: string; title?: Array<{ plain_text?: string }> };
-      if (p.type === 'title' && Array.isArray(p.title) && p.title.length > 0) {
-        title = p.title.map((t) => t.plain_text ?? '').join('');
-        break;
-      }
+      if (!isRecord(prop)) continue;
+      if (prop['type'] !== 'title') continue;
+      const titleArr: unknown = prop['title'];
+      if (!Array.isArray(titleArr) || titleArr.length === 0) continue;
+      title = titleArr
+        .filter(
+          (t): t is Record<string, unknown> => isRecord(t) && typeof t['plain_text'] === 'string'
+        )
+        .map((t) => String(t['plain_text']))
+        .join('');
+      break;
     }
 
     // Fetch block children with pagination and recursion

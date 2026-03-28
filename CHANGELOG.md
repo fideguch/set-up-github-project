@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026-03-28
+
+### Added
+
+- **Workspace Bridge**: 11 new MCP tools (5 Notion + 6 Google Workspace)
+  - Notion: `notion_search`, `notion_get_page`, `notion_query_database`, `notion_create_page`, `notion_append_blocks`
+  - Google: `workspace_search_drive`, `workspace_get_doc`, `workspace_get_sheet`, `workspace_get_slides`, `workspace_list_events`, `workspace_search_gmail`
+- NotionClient + GoogleClient abstractions (injectable, testable)
+- Notion block-to-Markdown converter (`notionBlocksToMarkdown`)
+- API specs documentation (`skills/workspace-bridge/api-specs/`)
+- Monthly API compatibility check CI workflow
+- MIT LICENSE
+- 82 new workspace bridge tests + 12 scenario tests
+- Cross-service bridge tests (Notion/Google → GitHub compatibility)
+
+### Changed
+
+- Tool count: 11 → 22 (existing 11 tools unchanged)
+- Test count: 375 → 459+
+- README/SKILL.md updated with workspace triggers and tool table
+
 ## [2.2.0] - 2026-03-28
 
 ### Added
