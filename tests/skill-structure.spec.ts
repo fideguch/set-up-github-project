@@ -697,7 +697,9 @@ test.describe('Cross-Reference Validation', () => {
     expect(skillDirs).toContain('typescript-best-practices');
     expect(skillDirs).toContain('git-workflow');
     expect(skillDirs).toContain('project-setup-automation');
-    expect(skillDirs.length).toBe(5);
+    expect(skillDirs).toContain('pm-figjam-diagrams');
+    expect(skillDirs).toContain('speckit-bridge');
+    expect(skillDirs.length).toBe(7);
   });
 });
 

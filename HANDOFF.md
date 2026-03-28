@@ -1,105 +1,109 @@
-# Handoff: GitHub Project Manager v4.0 実装完了
+# Handoff: PM Tool Suite v4.2 — GAFA品質レビュー + 5リポ改善実施
 
 ## 現在の状態
 
 - **リポジトリ**: https://github.com/fideguch/my_pm_tools
-- **リモート**: `git@github.com:fideguch/my_pm_tools.git` (SSH)
-- **ブランチ**: main
-- **テスト**: 339+ passed
-- **品質**: lint + typecheck + format:check 全パス
-- **ビルド**: `npm run build` 成功
+- **ブランチ**: main（未コミットの変更あり — 全5リポ）
+- **テスト**: 全リポでパス（詳細は下記）
 
-## 今回のセッション: v4.0 実装
+## 今回のセッションで実施した作業
 
-### Phase 1: SKILL.md トリガー拡張
+### 1. GAFA水準 5リポジトリ評価（完了）
 
-- triggers: 15 → 37（+22）
-- `scenarios:` 5件、`theme:` フィールド追加
-- `intent:` に英語ガイダンス、`best_for:` に編集機能反映
-- カテゴリ別コメント付き（日本語/英語/移行/ヘルプ/システム）
+5次元×20pt=100ptの採点基準を設計・適用。評価詳細は `~/.claude/plans/vectorized-bubbling-thacker.md` に保存。
 
-### Phase 2: Issue 編集 + 既存ツール改善
+### 2. my_pm_tools 改善（完了）
 
-#### 新規ファイル (8)
+| ファイル                   | 変更内容                                                          |
+| -------------------------- | ----------------------------------------------------------------- |
+| src/utils/field-helpers.ts | **新規** — getFieldValue, isBlocked, toProjectItem抽出（DRY修正） |
+| src/tools/list-items.ts    | import化 + try-catch 2箇所                                        |
+| src/tools/sprint-report.ts | import化 + try-catch 1箇所                                        |
+| src/tools/list-fields.ts   | try-catch 2箇所                                                   |
+| src/tools/add-item.ts      | try-catch 2箇所                                                   |
+| .github/workflows/ci.yml   | npm run build ステップ追加                                        |
 
-| ファイル                        | 内容                                     |
-| ------------------------------- | ---------------------------------------- |
-| `src/utils/gh-cli.ts`           | GhRunner 型 + createGhRunner()           |
-| `src/utils/status-alias.ts`     | ステータス別名解決（完全→別名→部分一致） |
-| `src/tools/get-issue.ts`        | GraphQL で Issue 詳細取得                |
-| `src/tools/edit-issue.ts`       | gh CLI で Issue タイトル・本文編集       |
-| `src/tools/manage-labels.ts`    | gh CLI でラベル追加・削除                |
-| `src/tools/manage-assignees.ts` | gh CLI でアサイン追加・削除              |
-| `src/tools/set-issue-state.ts`  | gh CLI で Issue クローズ・リオープン     |
-| `tests/scenarios/fixtures/`     | mock-gql.ts, mock-gh-cli.ts              |
+**検証**: 364 passed
 
-#### 変更ファイル (6)
+### 3. speckit-bridge 改善（完了、テスト0→57）
 
-| ファイル                   | 変更内容                                    |
-| -------------------------- | ------------------------------------------- |
-| `src/tools/index.ts`       | registerTools(server, gql, gh?) — 11 ツール |
-| `src/server.ts`            | createServer(gql, gh?) — gh オプショナル    |
-| `src/schemas/index.ts`     | repoParam 抽出 + 5 新規スキーマ             |
-| `src/types/index.ts`       | IssueDetail インターフェース追加            |
-| `src/graphql/queries.ts`   | GET_ISSUE_BY_NUMBER + ページネーション      |
-| `src/tools/move-status.ts` | ステータス別名マッチ + summary レスポンス   |
+Node.js基盤 + 57テスト + examples before/after + CI + CONTRIBUTING
+**検証**: 57 passed
 
-### Phase 3: designs/ コンテキスト認識
+### 4. pm-data-analysis 改善（完了、テスト0→25）
 
-- SKILL.md オンボーディングに designs/ 検出ステップ追加
-- Issue 作成時に Req-ID 付与、ラベル/Priority 自動推定
-- designs/ 不在時はスキップ（任意）
+Node.js基盤 + 25テスト + examples(cohort+AB) + CI + CONTRIBUTING + CHANGELOG
+**検証**: 25 passed
 
-### Phase 4: シナリオテスト
+### 5. pm-ad-operations 改善（完了、テスト0→42）
 
-5 シナリオ、25 テスト:
+Node.js基盤 + 42テスト + examples(Google+Meta CSV) + README強化 + CI + CONTRIBUTING + CHANGELOG
+**検証**: 42 passed
 
-- `onboarding.spec.ts` — 新規/既存プロジェクトフロー (4)
-- `daily-operations.spec.ts` — リスト/フィルタ/ステータス変更/別名 (6)
-- `issue-editing.spec.ts` — get→edit→labels→assignees→close/reopen (6)
-- `issue-identification.spec.ts` — キーワード検索→確認→編集 (5)
-- `designs-awareness.spec.ts` — designs/ 検出・Req-ID・不在処理 (4)
+### 6. requirements_designer 改善（ほぼ完了）
 
-### Phase 5: Five-File Sync & ドキュメント
+tests/helpers/ + tests/structure/ 3ファイル + tests/content/ 3ファイル + examples/ 2ディレクトリ + CHANGELOG.md 作成済み。
+分割6ファイルで322テスト移動済み。元ファイル484テストのうち残り162テスト未移動（元ファイル残存中）。
+**検証**: 644 passed（分割ファイル322 + 元ファイル484 = 重複込み）、分割のみで322 passed
 
-- skill-structure.spec.ts: 6→11 ツール、utils 存在、新スキーマチェック
-- README.md: MCP ツール表 6→11、ステータス別名説明
-- ADR-008: gh CLI ハイブリッドアプローチ
-- DECISION-LOG: P07-P11 を Implemented に更新
+## 未コミットの変更
 
-## メトリクス
+### my_pm_tools
 
-| 指標           | v3.0.0  | v4.0        |
-| -------------- | ------- | ----------- |
-| テスト         | 293 件  | **339+ 件** |
-| MCP ツール     | 6       | **11** (+5) |
-| TypeScript src | ~800 行 | ~1,200 行   |
-| ADR            | 7 件    | **8 件**    |
-| triggers       | 15      | **37**      |
+新規: src/utils/field-helpers.ts, skills/pm-figjam-diagrams/
+変更: src/tools/(list-items, sprint-report, list-fields, add-item).ts, .github/workflows/ci.yml, HANDOFF.md, tests/skill-structure.spec.ts
 
-## 重要ファイル
+### speckit-bridge (~/.claude/skills/speckit-bridge/)
 
-| ファイル                    | 役割                                   |
-| --------------------------- | -------------------------------------- |
-| `src/tools/index.ts`        | ツール登録ハブ (11 ツール)             |
-| `src/schemas/index.ts`      | Zod スキーマ (11 スキーマ + repoParam) |
-| `src/types/index.ts`        | 型定義 (IssueDetail 追加)              |
-| `src/utils/gh-cli.ts`       | gh CLI ラッパー (GhRunner)             |
-| `src/utils/status-alias.ts` | ステータス別名解決                     |
-| `src/graphql/queries.ts`    | GET_ISSUE_BY_NUMBER + ページネーション |
-| `SKILL.md`                  | トリガー 37 + designs/ 連携            |
+新規: package.json, tsconfig, playwright.config, tests/, examples/, .github/, CONTRIBUTING.md
+
+### pm-data-analysis (~/.claude/skills/pm-data-analysis/)
+
+新規: package.json, tsconfig, playwright.config, tests/, examples/, .github/, CONTRIBUTING.md, CHANGELOG.md
+
+### pm-ad-operations (~/.claude/skills/pm-ad-operations/)
+
+新規: package.json, tsconfig, playwright.config, tests/, examples/, .github/, CONTRIBUTING.md, CHANGELOG.md
+変更: README.md
+
+### requirements_designer (~/.claude/skills/requirements_designer/)
+
+新規: tests/helpers/test-helpers.ts, tests/structure/(3 files)
 
 ## 次のセッションでやること
 
-- `npm run build` でビルド確認 → `git push`
-- README.en.md のミラー更新
-- docs/USAGE.md に Issue 編集操作ガイド追加
-- CHANGELOG.md に v4.0 エントリ追加
+### P0: requirements_designer テスト分割完了
 
-## 将来検討（v4.0 スコープ外）
+- [x] tests/content/ に3ファイル作成済み
+- [x] examples/ 作成済み（saas-full-mode + mvp-light-mode）
+- [x] CHANGELOG.md 作成済み
+- [ ] 残り162テストを分割ファイルに移動
+- [ ] 元のskill-structure.spec.ts 削除
+- [ ] 分割ファイルのみで484テスト全パス確認
 
-- Undo スタック → `gh issue reopen` で手動復元可能
-- バッチ Import ツール → ユーザーが個別に Issue 化
-- AI Issue 生成 → Claude 自体の責務
-- 予測分析/バーンダウン → 個人チームに過剰
-- Slack/Google 連携 → ADR-007 で v2 以降に延期済み
+### P1: 全5リポ commit + push
+
+- [ ] my_pm_tools: feat: improve code quality — DRY, error handling, CI build
+- [ ] speckit-bridge: feat: add test infrastructure, examples, and CI
+- [ ] pm-data-analysis: feat: add test infrastructure, examples, and CI
+- [ ] pm-ad-operations: feat: add test infrastructure, examples, README, and CI
+- [ ] requirements_designer: refactor: split monolithic test file + add examples
+
+### P2: 再評価（Suite Average 72+目標）
+
+## 注意事項
+
+- speckit-bridgeは `~/.claude/skills/speckit-bridge/` で作業（my_pm_tools内の同名ディレクトリとは別物）
+- 評価基準詳細: `~/.claude/plans/vectorized-bubbling-thacker.md`
+- Planning検証ルール: `~/.claude/rules/common/planning-verification.md`
+
+## メトリクス
+
+| 指標                    | v4.1  | v4.2              |
+| ----------------------- | ----- | ----------------- |
+| my_pm_tools テスト      | 365   | 364               |
+| speckit-bridge テスト   | **0** | **57**            |
+| pm-data-analysis テスト | **0** | **25**            |
+| pm-ad-operations テスト | **0** | **42**            |
+| Suite Average           | 52.6  | **~68.4** (+15.8) |
+| Suite 総テスト数        | 849   | **973** (+124)    |

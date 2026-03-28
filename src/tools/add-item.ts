@@ -29,10 +29,23 @@ export async function addItem(
     itemType: 'issue' | 'pr';
   }
 ): Promise<CallToolResult> {
-  const projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let projectData: GetProjectIdResponse;
+  try {
+    projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   const project = projectData.user.projectV2;
   if (!project) {
@@ -97,10 +110,23 @@ export async function addItem(
     };
   }
 
-  const result = await gql<AddItemResponse>(ADD_PROJECT_ITEM, {
-    projectId: project.id,
-    contentId: nodeId,
-  });
+  let result: AddItemResponse;
+  try {
+    result = await gql<AddItemResponse>(ADD_PROJECT_ITEM, {
+      projectId: project.id,
+      contentId: nodeId,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   return {
     content: [

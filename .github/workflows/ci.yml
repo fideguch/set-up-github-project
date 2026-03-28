@@ -27,6 +27,9 @@ jobs:
       - name: Type Check
         run: npm run typecheck
 
+      - name: Build
+        run: npm run build
+
       - name: ShellCheck
         run: shellcheck scripts/*.sh
 

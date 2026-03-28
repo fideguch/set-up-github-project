@@ -7,9 +7,9 @@ import type {
   IterationFieldNode,
   Iteration,
   ItemNode,
-  FieldValueNode,
   SprintReport,
 } from '../types/index.js';
+import { getFieldValue, isBlocked } from '../utils/field-helpers.js';
 
 interface GetProjectFullResponse {
   readonly user: {
@@ -21,19 +21,6 @@ function isIterationField(field: FieldNode): field is IterationFieldNode {
   return 'configuration' in field;
 }
 
-function getFieldValue(item: ItemNode, fieldName: string): string | number | null {
-  for (const fv of item.fieldValues.nodes) {
-    if (!fv || !('field' in fv)) continue;
-    const typed = fv as FieldValueNode & { field?: { name?: string } };
-    if (typed.field?.name === fieldName) {
-      if ('name' in typed) return (typed as { name: string }).name;
-      if ('number' in typed) return (typed as { number: number }).number;
-      if ('title' in typed) return (typed as { title: string }).title;
-    }
-  }
-  return null;
-}
-
 function getIterationId(item: ItemNode): string | null {
   for (const fv of item.fieldValues.nodes) {
     if (fv && 'iterationId' in fv) {
@@ -41,11 +28,6 @@ function getIterationId(item: ItemNode): string | null {
     }
   }
   return null;
-}
-
-function isBlocked(item: ItemNode): boolean {
-  const labels = item.content?.labels?.nodes ?? [];
-  return labels.some((l) => l.name === 'blocked');
 }
 
 function addDays(dateStr: string, days: number): string {
@@ -104,10 +86,23 @@ export async function sprintReport(
   gql: typeof graphql,
   args: { owner: string; projectNumber: number; sprint: string }
 ): Promise<CallToolResult> {
-  const data = await gql<GetProjectFullResponse>(GET_PROJECT_FULL, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let data: GetProjectFullResponse;
+  try {
+    data = await gql<GetProjectFullResponse>(GET_PROJECT_FULL, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   const project = data.user.projectV2;
   if (!project) {

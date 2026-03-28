@@ -1,7 +1,8 @@
 import type { graphql } from '@octokit/graphql';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { GET_PROJECT_ID, GET_PROJECT_ITEMS } from '../graphql/queries.js';
-import type { ItemNode, FieldValueNode, ProjectItem } from '../types/index.js';
+import type { ItemNode } from '../types/index.js';
+import { toProjectItem } from '../utils/field-helpers.js';
 
 interface GetProjectIdResponse {
   readonly user: {
@@ -18,50 +19,6 @@ interface GetItemsResponse {
   };
 }
 
-function getFieldValue(item: ItemNode, fieldName: string): string | number | null {
-  for (const fv of item.fieldValues.nodes) {
-    if (!fv || !('field' in fv)) continue;
-    const fvTyped = fv as FieldValueNode & { field?: { name?: string } };
-    if (fvTyped.field?.name === fieldName) {
-      if ('name' in fvTyped) return (fvTyped as { name: string }).name;
-      if ('number' in fvTyped) return (fvTyped as { number: number }).number;
-      if ('title' in fvTyped) return (fvTyped as { title: string }).title;
-    }
-  }
-  return null;
-}
-
-function isBlocked(item: ItemNode): boolean {
-  const labels = item.content?.labels?.nodes ?? [];
-  return labels.some((l) => l.name === 'blocked');
-}
-
-function toProjectItem(item: ItemNode): ProjectItem {
-  const status = getFieldValue(item, 'Status');
-  const priority = getFieldValue(item, 'Priority');
-  const estimate = getFieldValue(item, 'Estimate');
-
-  return {
-    itemId: item.id,
-    number: item.content?.number ?? null,
-    title: item.content?.title ?? '(Draft)',
-    state: item.content?.state ?? null,
-    status: typeof status === 'string' ? status : null,
-    priority: typeof priority === 'string' ? priority : null,
-    estimate: typeof estimate === 'number' ? estimate : null,
-    sprint:
-      (() => {
-        const val = getFieldValue(item, 'Sprint');
-        return typeof val === 'string' ? val : null;
-      })() ??
-      (() => {
-        const val = getFieldValue(item, 'Iteration');
-        return typeof val === 'string' ? val : null;
-      })(),
-    isBlocked: isBlocked(item),
-  };
-}
-
 export async function listItems(
   gql: typeof graphql,
   args: {
@@ -71,10 +28,23 @@ export async function listItems(
     priorityFilter?: string;
   }
 ): Promise<CallToolResult> {
-  const projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let projectData: GetProjectIdResponse;
+  try {
+    projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   const project = projectData.user.projectV2;
   if (!project) {
@@ -89,9 +59,22 @@ export async function listItems(
     };
   }
 
-  const itemsData = await gql<GetItemsResponse>(GET_PROJECT_ITEMS, {
-    projectId: project.id,
-  });
+  let itemsData: GetItemsResponse;
+  try {
+    itemsData = await gql<GetItemsResponse>(GET_PROJECT_ITEMS, {
+      projectId: project.id,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   let items = itemsData.node.items.nodes.filter(Boolean).map(toProjectItem);
 

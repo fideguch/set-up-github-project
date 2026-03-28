@@ -23,10 +23,23 @@ export async function listFields(
   gql: typeof graphql,
   args: { owner: string; projectNumber: number }
 ): Promise<CallToolResult> {
-  const projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
-    login: args.owner,
-    number: args.projectNumber,
-  });
+  let projectData: GetProjectIdResponse;
+  try {
+    projectData = await gql<GetProjectIdResponse>(GET_PROJECT_ID, {
+      login: args.owner,
+      number: args.projectNumber,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   const project = projectData.user.projectV2;
   if (!project) {
@@ -41,9 +54,22 @@ export async function listFields(
     };
   }
 
-  const fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
-    projectId: project.id,
-  });
+  let fieldsData: GetFieldsResponse;
+  try {
+    fieldsData = await gql<GetFieldsResponse>(GET_PROJECT_FIELDS, {
+      projectId: project.id,
+    });
+  } catch (error: unknown) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: 'text',
+          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+    };
+  }
 
   const fields = fieldsData.node.fields.nodes.filter(Boolean).map((f) => ({
     id: f.id,
