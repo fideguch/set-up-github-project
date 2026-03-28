@@ -60,6 +60,7 @@ const MOCK_PROJECT_FULL = {
         ],
       },
       items: {
+        pageInfo: { hasNextPage: false, endCursor: null },
         nodes: [
           {
             id: 'PVTI_1',
@@ -222,7 +223,7 @@ test.describe('project_sprint_report tool', () => {
     expect(report.sprint).toBe('Sprint 2026-W13');
   });
 
-  test('returns truncated: false for small projects', async () => {
+  test('returns pagination metadata for small projects', async () => {
     const gql = createMockGql([MOCK_PROJECT_FULL]);
     const result = await sprintReport(gql, {
       owner: 'fideguch',
@@ -231,12 +232,12 @@ test.describe('project_sprint_report tool', () => {
     });
 
     const report = JSON.parse((result.content[0] as { text: string }).text);
-    expect(report.truncated).toBe(false);
-    expect(report.warning).toBeUndefined();
+    expect(report.totalItemsFetched).toBe(3);
+    expect(report.pagesFetched).toBe(1);
   });
 
-  test('returns truncated: true with warning when items hit 200 limit', async () => {
-    const manyItems = Array.from({ length: 200 }, (_, i) => ({
+  test('paginates through multiple pages of items', async () => {
+    const page1Items = Array.from({ length: 100 }, (_, i) => ({
       id: `PVTI_${i}`,
       content: {
         number: i + 1,
@@ -258,15 +259,52 @@ test.describe('project_sprint_report tool', () => {
       },
     }));
 
-    const bigProject = {
+    const page2Items = Array.from({ length: 50 }, (_, i) => ({
+      id: `PVTI_${100 + i}`,
+      content: {
+        number: 100 + i + 1,
+        title: `Item ${100 + i + 1}`,
+        state: 'OPEN',
+        labels: { nodes: [] },
+      },
+      fieldValues: {
+        nodes: [
+          { field: { name: 'Status' }, name: 'Done' },
+          {
+            field: { name: 'Sprint' },
+            title: 'Sprint 2026-W13',
+            iterationId: 'iter_current',
+            startDate: today,
+            duration: 14,
+          },
+        ],
+      },
+    }));
+
+    const page1 = {
       user: {
         projectV2: {
           ...MOCK_PROJECT_FULL.user.projectV2,
-          items: { nodes: manyItems },
+          items: {
+            pageInfo: { hasNextPage: true, endCursor: 'cursor_100' },
+            nodes: page1Items,
+          },
         },
       },
     };
-    const gql = createMockGql([bigProject]);
+    const page2 = {
+      user: {
+        projectV2: {
+          ...MOCK_PROJECT_FULL.user.projectV2,
+          items: {
+            pageInfo: { hasNextPage: false, endCursor: null },
+            nodes: page2Items,
+          },
+        },
+      },
+    };
+
+    const gql = createMockGql([page1, page2]);
     const result = await sprintReport(gql, {
       owner: 'fideguch',
       projectNumber: 1,
@@ -274,8 +312,10 @@ test.describe('project_sprint_report tool', () => {
     });
 
     const report = JSON.parse((result.content[0] as { text: string }).text);
-    expect(report.truncated).toBe(true);
-    expect(report.warning).toContain('200+');
+    expect(report.totalItemsFetched).toBe(150);
+    expect(report.pagesFetched).toBe(2);
+    expect(report.summary.total).toBe(150);
+    expect(report.summary.completed).toBe(50);
   });
 
   test('returns error for non-existent sprint', async () => {

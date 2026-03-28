@@ -118,9 +118,9 @@ export const GET_PROJECT_ITEMS = `
   }
 `;
 
-/** Get full project data (fields + items) for sprint reports. */
+/** Get full project data (fields + paginated items) for sprint reports. */
 export const GET_PROJECT_FULL = `
-  query GetProjectFull($login: String!, $number: Int!) {
+  query GetProjectFull($login: String!, $number: Int!, $cursor: String) {
     user(login: $login) {
       projectV2(number: $number) {
         id
@@ -147,7 +147,11 @@ export const GET_PROJECT_FULL = `
             }
           }
         }
-        items(first: 200) {
+        items(first: 100, after: $cursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             id
             content {

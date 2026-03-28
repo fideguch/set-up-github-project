@@ -18,6 +18,9 @@ interface GetProjectFullResponse {
   };
 }
 
+/** Maximum number of pagination requests to prevent runaway loops. */
+const MAX_PAGES = 20;
+
 function isIterationField(field: FieldNode): field is IterationFieldNode {
   return 'configuration' in field;
 }
@@ -87,6 +90,7 @@ export async function sprintReport(
   gql: typeof graphql,
   args: { owner: string; projectNumber: number; sprint: string }
 ): Promise<CallToolResult> {
+  // First page — also fetches fields and project metadata
   let data: GetProjectFullResponse;
   try {
     data = await gql<GetProjectFullResponse>(GET_PROJECT_FULL, {
@@ -118,10 +122,41 @@ export async function sprintReport(
     };
   }
 
+  // Paginate through all items
+  const allItems: ItemNode[] = [...project.items.nodes.filter(Boolean)];
+  let pageInfo = project.items.pageInfo;
+  let pageCount = 1;
+
+  while (pageInfo.hasNextPage && pageCount < MAX_PAGES) {
+    let nextPage: GetProjectFullResponse;
+    try {
+      nextPage = await gql<GetProjectFullResponse>(GET_PROJECT_FULL, {
+        login: args.owner,
+        number: args.projectNumber,
+        cursor: pageInfo.endCursor,
+      });
+    } catch (error: unknown) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: 'text',
+            text: `GitHub API error during pagination (page ${pageCount + 1}): ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+    const nextProject = nextPage.user.projectV2;
+    if (!nextProject) break;
+
+    allItems.push(...nextProject.items.nodes.filter(Boolean));
+    pageInfo = nextProject.items.pageInfo;
+    pageCount++;
+  }
+
   const target = findTargetSprint(project.fields.nodes, args.sprint);
 
   if (!target) {
-    // List available sprints
     const iterField = project.fields.nodes.find(isIterationField);
     const available = iterField
       ? [...iterField.configuration.iterations, ...iterField.configuration.completedIterations]
@@ -144,7 +179,7 @@ export async function sprintReport(
   const sprintEnd = addDays(iteration.startDate, iteration.duration);
 
   // Filter items for this sprint
-  const sprintItems = project.items.nodes.filter((item) => getIterationId(item) === iteration.id);
+  const sprintItems = allItems.filter((item) => getIterationId(item) === iteration.id);
 
   // Calculate stats
   const statusCounts: Record<string, number> = {};
@@ -204,9 +239,6 @@ export async function sprintReport(
     blockedItems,
   };
 
-  const itemCount = project.items.nodes.length;
-  const truncated = itemCount >= 200;
-
   return {
     content: [
       {
@@ -214,10 +246,8 @@ export async function sprintReport(
         text: JSON.stringify(
           {
             ...report,
-            truncated,
-            ...(truncated && {
-              warning: `Project has ${itemCount}+ items. Sprint report may be incomplete.`,
-            }),
+            totalItemsFetched: allItems.length,
+            pagesFetched: pageCount,
           },
           null,
           2

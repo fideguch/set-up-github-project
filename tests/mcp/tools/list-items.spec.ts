@@ -14,7 +14,7 @@ const MOCK_PROJECT_ID = { user: { projectV2: { id: 'PVT_123' } } };
 const MOCK_ITEMS = {
   node: {
     items: {
-      pageInfo: { hasNextPage: false },
+      pageInfo: { hasNextPage: false, endCursor: null },
       nodes: [
         {
           id: 'PVTI_item1',
@@ -136,30 +136,38 @@ test.describe('project_list_items tool', () => {
     expect(data.items[0].title).toBe('Fix login bug');
   });
 
-  test('returns truncated: false when all items fit', async () => {
+  test('returns pagination metadata for single page', async () => {
     const gql = createMockGql([MOCK_PROJECT_ID, MOCK_ITEMS]);
 
     const result = await listItems(gql, { owner: 'fideguch', projectNumber: 1 });
     const data = JSON.parse((result.content[0] as { text: string }).text);
-    expect(data.truncated).toBe(false);
-    expect(data.warning).toBeUndefined();
+    expect(data.pagesFetched).toBe(1);
+    expect(data.totalCount).toBe(3);
   });
 
-  test('returns truncated: true with warning when hasNextPage is true', async () => {
-    const truncatedItems = {
+  test('paginates through multiple pages', async () => {
+    const page1 = {
       node: {
         items: {
-          pageInfo: { hasNextPage: true },
-          nodes: MOCK_ITEMS.node.items.nodes,
+          pageInfo: { hasNextPage: true, endCursor: 'cursor_1' },
+          nodes: MOCK_ITEMS.node.items.nodes.slice(0, 2),
         },
       },
     };
-    const gql = createMockGql([MOCK_PROJECT_ID, truncatedItems]);
+    const page2 = {
+      node: {
+        items: {
+          pageInfo: { hasNextPage: false, endCursor: null },
+          nodes: MOCK_ITEMS.node.items.nodes.slice(2),
+        },
+      },
+    };
+    const gql = createMockGql([MOCK_PROJECT_ID, page1, page2]);
 
     const result = await listItems(gql, { owner: 'fideguch', projectNumber: 1 });
     const data = JSON.parse((result.content[0] as { text: string }).text);
-    expect(data.truncated).toBe(true);
-    expect(data.warning).toContain('100 items');
+    expect(data.pagesFetched).toBe(2);
+    expect(data.totalCount).toBe(3);
   });
 
   test('returns error for non-existent project', async () => {

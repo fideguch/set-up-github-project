@@ -5,11 +5,19 @@
 
 // --- GraphQL response types ---
 
+export interface PageInfo {
+  readonly hasNextPage: boolean;
+  readonly endCursor: string | null;
+}
+
 export interface ProjectV2 {
   readonly id: string;
   readonly title: string;
   readonly fields: { readonly nodes: readonly FieldNode[] };
-  readonly items: { readonly nodes: readonly ItemNode[] };
+  readonly items: {
+    readonly pageInfo: PageInfo;
+    readonly nodes: readonly ItemNode[];
+  };
 }
 
 export type FieldNode = SingleSelectFieldNode | IterationFieldNode | BasicFieldNode;
@@ -85,12 +93,12 @@ export function hasField(fv: FieldValueNode): fv is (
 
 /** Narrows to SingleSelectValueNode (has `field` and `name`). */
 export function isSelectValue(fv: FieldValueNode): fv is SingleSelectValueNode {
-  return hasField(fv) && 'name' in fv && typeof (fv as SingleSelectValueNode).name === 'string';
+  return hasField(fv) && 'name' in fv && typeof fv.name === 'string';
 }
 
 /** Narrows to NumberValueNode (has `field` and `number`). */
 export function isNumberValue(fv: FieldValueNode): fv is NumberValueNode {
-  return hasField(fv) && 'number' in fv && typeof (fv as NumberValueNode).number === 'number';
+  return hasField(fv) && 'number' in fv && typeof fv.number === 'number';
 }
 
 /** Narrows to IterationValueNode (has `field`, `title`, and `iterationId`). */

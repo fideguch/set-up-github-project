@@ -13,11 +13,17 @@ interface GetProjectIdResponse {
 interface GetItemsResponse {
   readonly node: {
     readonly items: {
-      readonly pageInfo: { readonly hasNextPage: boolean };
+      readonly pageInfo: {
+        readonly hasNextPage: boolean;
+        readonly endCursor: string | null;
+      };
       readonly nodes: readonly ItemNode[];
     };
   };
 }
+
+/** Maximum number of pagination requests to prevent runaway loops. */
+const MAX_PAGES = 20;
 
 export async function listItems(
   gql: typeof graphql,
@@ -59,24 +65,38 @@ export async function listItems(
     };
   }
 
-  let itemsData: GetItemsResponse;
-  try {
-    itemsData = await gql<GetItemsResponse>(GET_PROJECT_ITEMS, {
-      projectId: project.id,
-    });
-  } catch (error: unknown) {
-    return {
-      isError: true,
-      content: [
-        {
-          type: 'text',
-          text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ],
-    };
+  // Paginate through all items
+  const allNodes: ItemNode[] = [];
+  let cursor: string | null = null;
+  let hasMore = true;
+  let pageCount = 0;
+
+  while (hasMore && pageCount < MAX_PAGES) {
+    let itemsData: GetItemsResponse;
+    try {
+      itemsData = await gql<GetItemsResponse>(GET_PROJECT_ITEMS, {
+        projectId: project.id,
+        cursor,
+      });
+    } catch (error: unknown) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: 'text',
+            text: `GitHub API error: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+
+    allNodes.push(...itemsData.node.items.nodes.filter(Boolean));
+    hasMore = itemsData.node.items.pageInfo.hasNextPage;
+    cursor = itemsData.node.items.pageInfo.endCursor;
+    pageCount++;
   }
 
-  let items = itemsData.node.items.nodes.filter(Boolean).map(toProjectItem);
+  let items = allNodes.map(toProjectItem);
 
   if (args.statusFilter) {
     items = items.filter((i) => i.status === args.statusFilter);
@@ -84,8 +104,6 @@ export async function listItems(
   if (args.priorityFilter) {
     items = items.filter((i) => i.priority?.startsWith(args.priorityFilter!));
   }
-
-  const truncated = itemsData.node.items.pageInfo.hasNextPage;
 
   return {
     content: [
@@ -95,10 +113,7 @@ export async function listItems(
           {
             items,
             totalCount: items.length,
-            truncated,
-            ...(truncated && {
-              warning: 'Results limited to first 100 items. Project has more items not shown.',
-            }),
+            pagesFetched: pageCount,
           },
           null,
           2
