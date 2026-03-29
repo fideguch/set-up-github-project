@@ -4,13 +4,13 @@ import type { GhRunner } from './utils/gh-cli.js';
 import { registerTools } from './tools/index.js';
 
 /**
- * Create and configure the GitHub Project Manager MCP server.
+ * Create and configure the My PM Tools MCP server.
  * Separating server creation from transport allows testing without stdio.
  * @param gh - Optional GhRunner for issue write operations (defaults to real gh CLI).
  */
 export function createServer(gql: typeof graphql, gh?: GhRunner): McpServer {
   const server = new McpServer({
-    name: 'github-project-manager',
+    name: 'my-pm-tools',
     version: '2.0.0',
   });
 

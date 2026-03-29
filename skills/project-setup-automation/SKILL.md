@@ -2,7 +2,7 @@
 
 ## メタデータ
 
-- **トリガー**: 「GitHub Project環境構築」「プロジェクトボード設定」「14ステータス設定」「!github_project_manager」
+- **トリガー**: 「GitHub Project環境構築」「プロジェクトボード設定」「14ステータス設定」「!my_pm_tools」
 - **前提条件**: gh CLI 認証済み、Classic PAT（`ghp_`）取得済み、スコープ `project,repo,read:org`
 
 ## 概要

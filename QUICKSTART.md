@@ -1,6 +1,6 @@
 # Quick Start
 
-Get the GitHub Project Manager MCP server running in under 5 minutes.
+Get the My PM Tools MCP server running in under 5 minutes.
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ After building, add the server to `.mcp.json` in your project root:
 ```json
 {
   "mcpServers": {
-    "github-project-manager": {
+    "my_pm_tools": {
       "command": "node",
       "args": ["/absolute/path/to/my_pm_tools/dist/index.js"],
       "env": {

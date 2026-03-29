@@ -1,4 +1,4 @@
-# GitHub Project Manager — 運用ガイド
+# My PM Tools — 運用ガイド
 
 GitHub Projects V2 の日常管理・環境構築・分析を統合的にサポートするスキルの運用ガイドです。
 

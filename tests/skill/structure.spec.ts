@@ -335,7 +335,7 @@ test.describe('MCP Server Structure Validation', () => {
 
   test('package.json has bin entry', () => {
     const pkg = JSON.parse(readFile('package.json'));
-    expect(pkg.bin).toHaveProperty('github-project-manager');
+    expect(pkg.bin).toHaveProperty('my-pm-tools');
   });
 
   test('package.json has build script', () => {

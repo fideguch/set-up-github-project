@@ -1,4 +1,4 @@
-# GitHub Project Manager
+# My PM Tools
 
 [日本語](README.md)
 
@@ -55,7 +55,7 @@ On first launch, the skill auto-detects project state: unconfigured → Mode A, 
 ```bash
 git clone git@github.com:fideguch/my_pm_tools.git
 cd my_pm_tools
-./install.sh    # Installs to ~/.claude/skills/github-project-manager/
+./install.sh    # Installs to ~/.claude/skills/my_pm_tools/
 ```
 
 Invoke in Claude Code or Devin:
@@ -138,7 +138,7 @@ Add to Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "github-project-manager": {
+    "my_pm_tools": {
       "command": "node",
       "args": ["/path/to/my_pm_tools/dist/index.js"],
       "env": { "GITHUB_TOKEN": "ghp_..." }

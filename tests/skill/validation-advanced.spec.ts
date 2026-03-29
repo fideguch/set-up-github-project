@@ -5,9 +5,9 @@ import { readFile } from './helpers.js';
 // 14. PM Assistant Redesign Validation (v2.0.0)
 // ============================================================
 test.describe('PM Assistant Redesign Validation', () => {
-  test('SKILL.md name is github_project_manager', () => {
+  test('SKILL.md name is my_pm_tools', () => {
     const content = readFile('SKILL.md');
-    expect(content).toContain('name: github_project_manager');
+    expect(content).toContain('name: my_pm_tools');
   });
 
   test('SKILL.md has Onboarding section with config.json', () => {
@@ -52,14 +52,14 @@ test.describe('PM Assistant Redesign Validation', () => {
     expect(content).toContain('開発中にして');
   });
 
-  test('README.md title is GitHub Project Manager', () => {
+  test('README.md title is My PM Tools', () => {
     const content = readFile('README.md');
-    expect(content).toContain('# GitHub Project Manager');
+    expect(content).toContain('# My PM Tools');
   });
 
-  test('README.en.md title is GitHub Project Manager', () => {
+  test('README.en.md title is My PM Tools', () => {
     const content = readFile('README.en.md');
-    expect(content).toContain('# GitHub Project Manager');
+    expect(content).toContain('# My PM Tools');
   });
 
   test('USAGE.md has daily operations section before views section', () => {
@@ -86,7 +86,7 @@ test.describe('PM Assistant Redesign Validation', () => {
 
   test('install.sh uses new skill directory name', () => {
     const content = readFile('install.sh');
-    expect(content).toContain('github-project-manager');
+    expect(content).toContain('my_pm_tools');
   });
 });
 

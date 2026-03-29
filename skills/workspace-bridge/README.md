@@ -2,7 +2,7 @@
 
 ## 概要
 
-GitHub Project Manager に Notion と Google Workspace の読み書き連携機能を提供するスキルです。16の MCP ツール（11 Read + 5 Write）を通じて、外部ドキュメントやデータソースとプロジェクト管理ワークフローを双方向に橋渡しします。
+My PM Tools に Notion と Google Workspace の読み書き連携機能を提供するスキルです。16の MCP ツール（11 Read + 5 Write）を通じて、外部ドキュメントやデータソースとプロジェクト管理ワークフローを双方向に橋渡しします。
 
 ## 対応サービス
 

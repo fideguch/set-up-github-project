@@ -27,7 +27,7 @@ test.describe('SKILL.md Content Validation', () => {
   });
 
   test('has metadata section with macro', () => {
-    expect(content).toContain('!github_project_manager');
+    expect(content).toContain('!my_pm_tools');
   });
 
   test('has triggers in frontmatter', () => {
@@ -466,7 +466,7 @@ test.describe('Skill Maturity Validation', () => {
 
   test('README.en.md exists with English content', () => {
     const content = readFile('README.en.md');
-    expect(content).toContain('# GitHub Project Manager');
+    expect(content).toContain('# My PM Tools');
     expect(content).toContain('Prerequisites');
     expect(content).toContain('Installation');
   });

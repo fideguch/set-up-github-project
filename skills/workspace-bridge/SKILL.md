@@ -1,7 +1,7 @@
 ---
 name: workspace-bridge
 description: >-
-  Notion + Google Workspace bridge for GitHub Project Manager.
+  Notion + Google Workspace bridge for My PM Tools.
   Provides 16 MCP tools for reading/writing Notion pages and databases,
   searching Google Drive, reading/writing Sheets, listing/creating Calendar events,
   and searching Gmail. Extends the core project management workflow
@@ -31,7 +31,7 @@ estimated_time: '1-5 min per operation'
 
 # Workspace Bridge
 
-Notion + Google Workspace bridge for GitHub Project Manager. Provides read/write access to external PM tools through 16 MCP tools.
+Notion + Google Workspace bridge for My PM Tools. Provides read/write access to external PM tools through 16 MCP tools.
 
 ---
 

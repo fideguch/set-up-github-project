@@ -51,7 +51,7 @@ Claude Desktop または Claude Code の MCP 設定に追加:
 ```json
 {
   "mcpServers": {
-    "github-project-manager": {
+    "my_pm_tools": {
       "command": "node",
       "args": ["/path/to/my_pm_tools/dist/index.js"],
       "env": {

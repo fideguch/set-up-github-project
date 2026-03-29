@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Maintain and extend the `github_project_manager` skill.
+Maintain and extend the `my_pm_tools` skill.
 PM assistant for GitHub Projects V2 with 3 modes:
 
 - **Mode A**: Environment setup (14 statuses, 6 views, 13 labels, templates, workflows; `--lite` option: 8/3/5)
@@ -27,7 +27,7 @@ This prevents structural drift, `as` cast regression, circular imports, and patt
 ## Project Structure
 
 ```
-github-project-manager/
+my_pm_tools/
 ├── SKILL.md                     # Skill definition (3-mode architecture)
 ├── README.md / README.en.md     # User-facing documentation
 ├── CLAUDE.md                    # Project instructions (this file)

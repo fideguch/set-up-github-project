@@ -1,6 +1,6 @@
 # MCP Integration
 
-How to configure the GitHub Project Manager MCP server so Claude Code (or any
+How to configure the My PM Tools MCP server so Claude Code (or any
 MCP-capable agent) can call the 27 MCP tools directly.
 
 ## Build the server
@@ -23,7 +23,7 @@ Create or edit `/path/to/your-project/.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "github-project-manager": {
+    "my_pm_tools": {
       "command": "node",
       "args": ["/absolute/path/to/my_pm_tools/dist/index.js"],
       "env": {
@@ -42,7 +42,7 @@ or `%APPDATA%\Claude\claude_desktop_config.json` on Windows:
 ```json
 {
   "mcpServers": {
-    "github-project-manager": {
+    "my_pm_tools": {
       "command": "node",
       "args": ["/absolute/path/to/my_pm_tools/dist/index.js"],
       "env": {
@@ -63,7 +63,7 @@ In Claude Code, run:
 /mcp
 ```
 
-You should see `github-project-manager` listed as an active server with 27 tools.
+You should see `my_pm_tools` listed as an active server with 27 tools.
 
 ## Tool reference
 

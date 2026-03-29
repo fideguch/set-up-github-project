@@ -1,6 +1,6 @@
 # Contributing Guide
 
-GitHub Project Manager への貢献ガイドです。
+My PM Tools への貢献ガイドです。
 
 ## 開発フロー
 

@@ -1,6 +1,6 @@
 # Examples
 
-Practical guides for using the GitHub Project Manager MCP server across all three modes.
+Practical guides for using the My PM Tools MCP server across all three modes.
 
 ## Index
 

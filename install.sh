@@ -1,8 +1,8 @@
 #!/bin/bash
-# install.sh — Install github-project-manager skill to ~/.claude/skills/
+# install.sh — Install my_pm_tools skill to ~/.claude/skills/
 set -euo pipefail
 
-SKILL_NAME="github-project-manager"
+SKILL_NAME="my_pm_tools"
 SKILL_DIR="${HOME}/.claude/skills/${SKILL_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -54,7 +54,7 @@ echo "Skill installed to: $SKILL_DIR"
 echo ""
 echo "Usage:"
 echo "  Tell Claude: \"GitHub Projectsの環境を構築したい\""
-echo "  Or use macro: !github_project_manager"
+echo "  Or use macro: !my_pm_tools"
 echo ""
 echo "=== Workspace Bridge (Optional) ==="
 echo "To enable Notion + Google Workspace integration, set these environment variables:"
