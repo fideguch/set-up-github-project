@@ -201,6 +201,7 @@ async function refreshAccessToken(creds: GoogleCredentials): Promise<string> {
       refresh_token: creds.refreshToken,
       grant_type: 'refresh_token',
     }),
+    signal: AbortSignal.timeout(10000),
   });
 
   if (!res.ok) {

@@ -201,3 +201,94 @@ test.describe('GoogleClient OAuth2 token refresh', () => {
     }
   });
 });
+
+test.describe('GoogleClient regression tests', () => {
+  test('mimeType with single quote does not break the query', async () => {
+    let capturedUrl = '';
+    const originalFetch = globalThis.fetch;
+
+    globalThis.fetch = async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.includes('oauth2.googleapis.com')) {
+        return mockResponse(200, TOKEN_RESPONSE);
+      }
+
+      capturedUrl = url;
+      return mockResponse(200, { files: [] });
+    };
+
+    try {
+      const client = createGoogleClient(MOCK_CREDS);
+      await client.searchDrive('test', { mimeType: "application/vnd.google-apps.document'" });
+
+      // The single quote in mimeType should be escaped with backslash
+      expect(capturedUrl).toContain('mimeType');
+      expect(capturedUrl).not.toContain("mimeType = 'application/vnd.google-apps.document''");
+      // Verify the escaped form is present (URL-encoded backslash-quote)
+      const params = new URL(capturedUrl).searchParams;
+      const q = params.get('q') ?? '';
+      expect(q).toContain("mimeType = 'application/vnd.google-apps.document\\'");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  test('"sprint=5" is NOT detected as a Drive operator query', async () => {
+    let capturedUrl = '';
+    const originalFetch = globalThis.fetch;
+
+    globalThis.fetch = async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.includes('oauth2.googleapis.com')) {
+        return mockResponse(200, TOKEN_RESPONSE);
+      }
+
+      capturedUrl = url;
+      return mockResponse(200, { files: [] });
+    };
+
+    try {
+      const client = createGoogleClient(MOCK_CREDS);
+      await client.searchDrive('sprint=5');
+
+      // "sprint=5" has no spaces around "=", so isDriveOperatorQuery returns false
+      // It should be wrapped as a name search, not passed through as an operator query
+      const params = new URL(capturedUrl).searchParams;
+      const q = params.get('q') ?? '';
+      expect(q).toContain("name contains 'sprint=5'");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  test('refreshAccessToken fetch includes abort signal for timeout', async () => {
+    let capturedInit: RequestInit | undefined;
+    const originalFetch = globalThis.fetch;
+
+    globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.includes('oauth2.googleapis.com')) {
+        capturedInit = init;
+        // Simulate a timeout by throwing AbortError
+        const error = new DOMException('The operation was aborted.', 'AbortError');
+        throw error;
+      }
+
+      return mockResponse(200, { files: [] });
+    };
+
+    try {
+      const client = createGoogleClient(MOCK_CREDS);
+      await expect(client.searchDrive('test')).rejects.toThrow();
+
+      // Verify the fetch call to oauth2 endpoint included a signal
+      expect(capturedInit).toBeDefined();
+      expect(capturedInit!.signal).toBeDefined();
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+});
