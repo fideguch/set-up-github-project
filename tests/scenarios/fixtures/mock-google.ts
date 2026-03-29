@@ -9,6 +9,7 @@ import type {
   SheetValuesResponse,
   SheetUpdateResponse,
   SheetAppendResponse,
+  SpreadsheetMetadata,
   EventListResponse,
   CalendarEventResponse,
   GmailListResponse,
@@ -34,6 +35,7 @@ export function createMockGoogle(responses: readonly unknown[]): GoogleClient {
     getSheetValues: async () => next() as SheetValuesResponse,
     updateSheetValues: async () => next() as SheetUpdateResponse,
     appendSheetValues: async () => next() as SheetAppendResponse,
+    getSpreadsheetMetadata: async () => next() as SpreadsheetMetadata,
     listEvents: async () => next() as EventListResponse,
     createEvent: async () => next() as CalendarEventResponse,
     listGmailMessages: async () => next() as GmailListResponse,
@@ -136,6 +138,22 @@ export const MOCK_CALENDAR_EVENT_CREATED: CalendarEventResponse = {
   status: 'confirmed',
   description: 'Sprint 6 planning',
   location: 'Room A',
+};
+
+export const MOCK_SPREADSHEET_METADATA: SpreadsheetMetadata = {
+  spreadsheetId: 'sheet-456',
+  properties: { title: 'Sprint Data' },
+  sheets: [
+    {
+      properties: {
+        sheetId: 0,
+        title: 'Sheet1',
+        index: 0,
+        sheetType: 'GRID',
+        gridProperties: { rowCount: 1000, columnCount: 26 },
+      },
+    },
+  ],
 };
 
 export const MOCK_GMAIL_MESSAGE: GmailMessageResponse = {

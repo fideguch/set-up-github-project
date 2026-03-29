@@ -15,6 +15,7 @@ Before writing or modifying any code in this project, MUST read:
 
 1. **`.claude/rules/codebase-integrity.md`** — Architecture patterns, type safety rules, shell conventions, test patterns, naming conventions, change checklist
 2. **This file (CLAUDE.md)** — Project structure, Five-File Sync Rule, key commands
+3. **`docs/new-tool-onboarding.md`** — New external API tool onboarding process (bloodline connectivity gate)
 
 This prevents structural drift, `as` cast regression, circular imports, and pattern-breaking changes. Skip this gate only for documentation-only edits.
 

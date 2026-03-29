@@ -37,6 +37,27 @@ export interface DriveSearchOpts {
 
 // --- Sheets API v4 ---
 
+export interface SheetProperties {
+  readonly sheetId: number;
+  readonly title: string;
+  readonly index: number;
+  readonly sheetType: string;
+  readonly gridProperties: {
+    readonly rowCount: number;
+    readonly columnCount: number;
+  };
+}
+
+export interface SpreadsheetMetadata {
+  readonly spreadsheetId: string;
+  readonly properties?: {
+    readonly title: string;
+  };
+  readonly sheets: readonly {
+    readonly properties: SheetProperties;
+  }[];
+}
+
 export interface SheetValuesResponse {
   readonly range: string;
   readonly majorDimension: string;

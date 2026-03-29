@@ -7,6 +7,9 @@
  * Scopes: drive.readonly, spreadsheets.readonly, calendar.readonly, gmail.readonly
  *         spreadsheets (write), calendar (write)
  */
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { homedir } from 'os';
 import type {
   GoogleCredentials,
   DriveSearchResponse,
@@ -14,6 +17,7 @@ import type {
   SheetValuesResponse,
   SheetUpdateResponse,
   SheetAppendResponse,
+  SpreadsheetMetadata,
   EventListResponse,
   EventListParams,
   CalendarEventInput,
@@ -53,6 +57,7 @@ export interface GoogleClient {
     calendarId: string,
     event: CalendarEventInput
   ) => Promise<CalendarEventResponse>;
+  readonly getSpreadsheetMetadata: (spreadsheetId: string) => Promise<SpreadsheetMetadata>;
   readonly listGmailMessages: (query: string, opts?: GmailListOpts) => Promise<GmailListResponse>;
   readonly getGmailMessage: (messageId: string) => Promise<GmailMessageResponse>;
 }
@@ -211,6 +216,90 @@ async function refreshAccessToken(creds: GoogleCredentials): Promise<string> {
   return token;
 }
 
+/** Default path to gcloud Application Default Credentials file. */
+const ADC_PATH = join(homedir(), '.config', 'gcloud', 'application_default_credentials.json');
+
+/**
+ * ADC file shape — only the fields we need for OAuth2 refresh.
+ * gcloud ADC files contain additional fields (type, project_id, etc.) which we ignore.
+ */
+interface AdcFile {
+  readonly client_id?: string;
+  readonly client_secret?: string;
+  readonly refresh_token?: string;
+}
+
+/**
+ * Load Google OAuth2 credentials from gcloud Application Default Credentials.
+ * Reads ~/.config/gcloud/application_default_credentials.json and extracts
+ * client_id, client_secret, and refresh_token.
+ *
+ * @returns GoogleCredentials if the file exists and contains required fields, null otherwise.
+ */
+export function loadCredentialsFromADC(path?: string): GoogleCredentials | null {
+  const adcPath = path ?? ADC_PATH;
+  try {
+    const raw = readFileSync(adcPath, 'utf-8');
+    const parsed: unknown = JSON.parse(raw);
+    if (parsed == null || typeof parsed !== 'object') return null;
+
+    const adc = parsed as AdcFile;
+    const clientId = adc.client_id;
+    const clientSecret = adc.client_secret;
+    const refreshToken = adc.refresh_token;
+
+    if (
+      typeof clientId !== 'string' ||
+      clientId === '' ||
+      typeof clientSecret !== 'string' ||
+      clientSecret === '' ||
+      typeof refreshToken !== 'string' ||
+      refreshToken === ''
+    ) {
+      return null;
+    }
+
+    return { clientId, clientSecret, refreshToken };
+  } catch {
+    // File doesn't exist or isn't valid JSON — graceful fallback
+    return null;
+  }
+}
+
+/**
+ * Convenience factory: create a GoogleClient using ADC auto-detection.
+ * Falls back to env vars (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
+ * if ADC file is not available.
+ *
+ * @throws Error if neither ADC nor env vars provide valid credentials.
+ */
+export function createGoogleClientFromADC(): GoogleClient {
+  const adcCreds = loadCredentialsFromADC();
+  if (adcCreds) {
+    return createGoogleClient(adcCreds);
+  }
+
+  // Fallback: env vars
+  const clientId = process.env['GOOGLE_CLIENT_ID'] ?? '';
+  const clientSecret = process.env['GOOGLE_CLIENT_SECRET'] ?? '';
+  const refreshToken = process.env['GOOGLE_REFRESH_TOKEN'] ?? '';
+
+  if (clientId && clientSecret && refreshToken) {
+    return createGoogleClient({ clientId, clientSecret, refreshToken });
+  }
+
+  throw new Error(
+    'Google credentials not found. Provide either:\n' +
+      '  1. gcloud ADC file at ~/.config/gcloud/application_default_credentials.json\n' +
+      '  2. Environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN'
+  );
+}
+
+/** Detect if query already uses Drive API operators (pass-through mode). */
+function isDriveOperatorQuery(q: string): boolean {
+  return /\b(contains|!=|<=|>=|in\b|has\b|not\b)/i.test(q) || q.includes('=');
+}
+
 /**
  * Create a real GoogleClient that calls Google Workspace APIs.
  * Refreshes OAuth2 access token on each call for simplicity.
@@ -232,14 +321,14 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
     searchDrive: async (query, opts) => {
       const token = await getToken();
       const safeQuery = query.replace(/'/g, "\\'");
+      const baseQuery = isDriveOperatorQuery(query) ? safeQuery : `name contains '${safeQuery}'`;
       const params = new URLSearchParams({
-        q: `${safeQuery} and trashed = false`,
+        q: opts?.mimeType
+          ? `${baseQuery} and mimeType = '${opts.mimeType}' and trashed = false`
+          : `${baseQuery} and trashed = false`,
         pageSize: String(opts?.limit ?? 20),
         fields: 'files(id,name,mimeType,webViewLink,modifiedTime),nextPageToken',
       });
-      if (opts?.mimeType) {
-        params.set('q', `${safeQuery} and mimeType = '${opts.mimeType}' and trashed = false`);
-      }
       return googleFetch<DriveSearchResponse>(
         `https://www.googleapis.com/drive/v3/files?${params.toString()}`,
         token
@@ -277,6 +366,17 @@ export function createGoogleClient(creds: GoogleCredentials): GoogleClient {
       const encodedCalId = encodeURIComponent(calendarId);
       return googleFetch<EventListResponse>(
         `https://www.googleapis.com/calendar/v3/calendars/${encodedCalId}/events?${q.toString()}`,
+        token
+      );
+    },
+
+    getSpreadsheetMetadata: async (spreadsheetId) => {
+      const token = await getToken();
+      const params = new URLSearchParams({
+        fields: 'spreadsheetId,properties.title,sheets.properties',
+      });
+      return googleFetch<SpreadsheetMetadata>(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?${params.toString()}`,
         token
       );
     },

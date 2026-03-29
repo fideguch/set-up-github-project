@@ -22,6 +22,7 @@ import { workspaceGetDoc } from '../../src/tools/workspace/get-doc.js';
 import { workspaceGetSheet } from '../../src/tools/workspace/get-sheet.js';
 import { workspaceUpdateSheet } from '../../src/tools/workspace/update-sheet.js';
 import { workspaceAppendSheet } from '../../src/tools/workspace/append-sheet.js';
+import { createGoogleClientFromADC } from '../../src/utils/google-client.js';
 import type { GoogleClient } from '../../src/utils/google-client.js';
 import type {
   SheetValuesResponse,
@@ -65,6 +66,8 @@ function createTrackedMockGoogle(responses: readonly unknown[]): {
       next('updateSheetValues') as ReturnType<GoogleClient['updateSheetValues']>,
     appendSheetValues: async () =>
       next('appendSheetValues') as ReturnType<GoogleClient['appendSheetValues']>,
+    getSpreadsheetMetadata: async () =>
+      next('getSpreadsheetMetadata') as ReturnType<GoogleClient['getSpreadsheetMetadata']>,
     listEvents: async () => next('listEvents') as ReturnType<GoogleClient['listEvents']>,
     createEvent: async () => next('createEvent') as ReturnType<GoogleClient['createEvent']>,
     listGmailMessages: async () =>
@@ -403,53 +406,89 @@ test.describe('Layer 1: Mock Integration — Sheets Append→Rollback', () => {
 });
 
 // ================================================================
-// Layer 2: Live API test scaffolding
+// Layer 2: Live API tests (gated by GOOGLE_LIVE_TEST=1)
+// Credentials auto-detected from gcloud ADC, with env var fallback.
 // ================================================================
 
 const LIVE = !!process.env['GOOGLE_LIVE_TEST'];
-const LIVE_SPREADSHEET_ID = process.env['GOOGLE_TEST_SPREADSHEET_ID'] ?? '';
-const LIVE_DOC_ID = process.env['GOOGLE_TEST_DOC_ID'] ?? '';
+const LIVE_SPREADSHEET_ID =
+  process.env['GOOGLE_TEST_SPREADSHEET_ID'] ?? '1kYRpPqR634PL7a-fvOOzHefbHWlliY-1MU94cDw9lyc';
+const LIVE_DOC_ID =
+  process.env['GOOGLE_TEST_DOC_ID'] ?? '1gkKFsE1PpPZJE34guUctJ9OVhL_nV4Ftehd_lBcHI7M';
 
-test.describe('Layer 2: Live API — Google Sheets Read→Write→Rollback', () => {
+/**
+ * Lazily create the live GoogleClient. Only called when LIVE tests run.
+ * Uses ADC auto-detection → env var fallback via createGoogleClientFromADC().
+ */
+function createLiveClient(): GoogleClient {
+  return createGoogleClientFromADC();
+}
+
+test.describe('Layer 2: Live API — Google Drive Search', () => {
   test.skip(!LIVE, 'Skipped: set GOOGLE_LIVE_TEST=1 to run live tests');
 
-  // Placeholder: real GoogleClient would be created here
-  // const creds = { clientId: '...', clientSecret: '...', refreshToken: '...' };
-  // const google = createGoogleClient(creds);
-
-  test('live sheet read→write→rollback cycle', async () => {
-    // TODO: Implement with real GoogleClient when credentials are available
-    // Step 1: Read original values
-    // Step 2: Update a cell with test value
-    // Step 3: Read and verify change
-    // Step 4: Restore original values
-    // Step 5: Read and verify rollback
-    expect(LIVE_SPREADSHEET_ID).toBeTruthy();
-    test.info().annotations.push({
-      type: 'info',
-      description: `Live test target: ${LIVE_SPREADSHEET_ID}`,
-    });
+  test('live drive search returns files array', async () => {
+    const google = createLiveClient();
+    const result = await google.searchDrive('test');
+    expect(result).toHaveProperty('files');
+    expect(Array.isArray(result.files)).toBe(true);
   });
 });
 
 test.describe('Layer 2: Live API — Google Docs Read', () => {
   test.skip(!LIVE, 'Skipped: set GOOGLE_LIVE_TEST=1 to run live tests');
 
-  test('live doc read returns markdown', async () => {
-    // TODO: Implement with real GoogleClient when credentials are available
-    expect(LIVE_DOC_ID).toBeTruthy();
-    test.info().annotations.push({
-      type: 'info',
-      description: `Live test target: ${LIVE_DOC_ID}`,
-    });
+  test('live doc read returns content', async () => {
+    const google = createLiveClient();
+    const content = await google.exportFile(LIVE_DOC_ID, 'text/plain');
+    // Empty documents return empty string from text/plain export (valid behavior)
+    expect(typeof content).toBe('string');
   });
 });
 
-test.describe('Layer 2: Live API — Google Drive Search', () => {
+test.describe('Layer 2: Live API — Google Sheets Read→Write→Rollback', () => {
   test.skip(!LIVE, 'Skipped: set GOOGLE_LIVE_TEST=1 to run live tests');
 
-  test('live drive search returns files', async () => {
-    // TODO: Implement with real GoogleClient when credentials are available
-    test.info().annotations.push({ type: 'info', description: 'Live Drive search' });
+  test('live sheet read→write→verify→clear→verify on Z99', async () => {
+    const google = createLiveClient();
+    const testValue = 'TEST_VALUE';
+
+    // Step 0: Discover actual sheet name via metadata
+    const metadata = await google.getSpreadsheetMetadata(LIVE_SPREADSHEET_ID);
+    expect(metadata.sheets.length).toBeGreaterThan(0);
+    const sheetName = metadata.sheets[0]!.properties.title;
+    // Use single quotes for A1 notation (handles Japanese/special chars)
+    const testRange = `'${sheetName}'!Z99`;
+
+    // Step 1: Read Z99 — should be empty (or at least readable)
+    const original = await google.getSheetValues(LIVE_SPREADSHEET_ID, testRange);
+    const origRows = original.values ?? [];
+    const originalValue =
+      origRows.length > 0 && origRows[0] !== undefined && origRows[0].length > 0
+        ? (origRows[0][0] ?? '')
+        : '';
+
+    // Step 2: Write test value
+    await google.updateSheetValues(LIVE_SPREADSHEET_ID, testRange, [[testValue]]);
+
+    // Step 3: Read back and verify
+    const afterWrite = await google.getSheetValues(LIVE_SPREADSHEET_ID, testRange);
+    const writeRows = afterWrite.values ?? [];
+    expect(writeRows.length).toBeGreaterThan(0);
+    const firstWriteRow = writeRows[0];
+    expect(firstWriteRow).toBeDefined();
+    expect(firstWriteRow![0]).toBe(testValue);
+
+    // Step 4: Clear (write empty string to restore)
+    await google.updateSheetValues(LIVE_SPREADSHEET_ID, testRange, [[originalValue]]);
+
+    // Step 5: Read back and verify it's restored
+    const afterClear = await google.getSheetValues(LIVE_SPREADSHEET_ID, testRange);
+    const clearRows = afterClear.values ?? [];
+    const clearedValue =
+      clearRows.length > 0 && clearRows[0] !== undefined && clearRows[0].length > 0
+        ? (clearRows[0][0] ?? '')
+        : '';
+    expect(clearedValue).toBe(originalValue);
   });
 });
