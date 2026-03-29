@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.0] - 2026-03-29
+
+### Added
+
+- **Workspace Bridge Write Tools**: 5 new MCP tools for bidirectional integration
+  - `workspace_update_sheet`: Update Google Sheets cell values (PUT values/{range})
+  - `workspace_append_sheet`: Append rows to Google Sheets (POST values:append)
+  - `workspace_create_event`: Create Google Calendar events (RFC3339 + all-day support)
+  - `notion_update_page`: Update Notion page properties (13 property types)
+  - `notion_archive_page`: Archive/unarchive Notion pages (reversible)
+- `is2DArray` type guard for Sheets value validation (zero `as` casts in new tools)
+- 403 OAuth scope detection with actionable re-authorization message
+- OAuth scope migration documentation in docs/workspace-bridge.md
+- 26 new tests for write tools (5 test files)
+
+### Changed
+
+- `googleFetchCore` refactored to support POST/PUT/PATCH/DELETE via `GoogleFetchOptions`
+- `googleFetch<T>` and `googleFetchText` now accept optional `opts` parameter
+- GoogleClient interface: +3 write methods (updateSheetValues, appendSheetValues, createEvent)
+- NotionClient interface: +1 write method (updatePage)
+- OAuth scopes: spreadsheets.readonly → spreadsheets, calendar.readonly → calendar
+- MCP tool count: 22 → 27
+- Test count: 476 → 502
+
+### Fixed
+
+- brace-expansion dependency vulnerability (moderate → 0 vulnerabilities)
+
 ## [3.0.0] - 2026-03-28
 
 ### Added

@@ -6,6 +6,19 @@ A PM assistant skill for GitHub Projects V2. Covers environment setup, daily ope
 
 "Create an issue", "Change status", "Sprint report" — execute PM daily tasks instantly via CLI. From full project setup to Jira/Linear migration.
 
+## Product Vision
+
+> **JTBD**: PMs execute GitHub Projects V2 management and Notion/Google Workspace read-write operations via natural language
+
+| Field           | Definition                                                                                                                        |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Target User** | PMs / Tech Leads in solo or small teams (1-10 people)                                                                             |
+| **Core Value**  | Absorbs GraphQL API + Notion API + Google APIs complexity into CLI. Bidirectional document, spreadsheet, and calendar integration |
+| **Scope**       | Mode A(Setup), Mode B(Daily Ops), Mode C(Analytics), Migration, Workspace Bridge(Read+Write)                                      |
+| **Non-Goals**   | GUI, multi-Org support, self-built Slack integration, full Jira/Linear replacement, Gmail sending                                 |
+
+**Suite position**: `requirements_designer → speckit-bridge → **my_pm_tools** → pm-data-analysis`. The execution management layer after specs are finalized.
+
 ## 3 Modes
 
 | Mode                     | Purpose                                               | Key Operations                                        |
