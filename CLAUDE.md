@@ -47,7 +47,8 @@ my_pm_tools/
 │   ├── index.ts                 # Entry point (stdio transport)
 │   ├── server.ts                # Server factory
 │   ├── graphql/                 # GraphQL client, queries, mutations
-│   ├── tools/                   # 28 MCP tools
+│   ├── tools/                   # 31 MCP tools
+│   │   ├── issue-sync/          # Issue Sync tools (3: scan-zombies, scan-todos, backlog-report)
 │   │   ├── notion/              # Notion API tools (7: search, get-page, query-db, create-page, append-blocks, update-page, archive-page)
 │   │   ├── workspace/           # Google Workspace tools (9: drive, docs, sheets, slides, calendar, gmail, update-sheet, append-sheet, create-event)
 │   │   └── *.ts                 # GitHub Project tools (12: list-fields, list-items, add-item, create-issue, etc.)

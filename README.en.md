@@ -149,35 +149,39 @@ Add to Claude Desktop config:
 
 ### MCP Tools
 
-| Tool                       | Method       | Description                                                   |
-| -------------------------- | ------------ | ------------------------------------------------------------- |
-| `project_list_fields`      | GraphQL      | List fields and their options                                 |
-| `project_list_items`       | GraphQL      | List items with status/priority filter (pagination support)   |
-| `project_add_item`         | GraphQL      | Add an Issue or PR to the project                             |
-| `project_move_status`      | GraphQL      | Change item status (alias support: "dev"→"開発中")            |
-| `project_set_priority`     | GraphQL      | Set priority (P0-P4)                                          |
-| `project_sprint_report`    | GraphQL      | Generate sprint report                                        |
-| `project_get_issue`        | GraphQL      | Get issue details (title, body, labels, assignees, milestone) |
-| `project_edit_issue`       | gh CLI       | Edit issue title and/or body                                  |
-| `project_manage_labels`    | gh CLI       | Add or remove labels on an issue                              |
-| `project_manage_assignees` | gh CLI       | Add or remove assignees on an issue                           |
-| `project_set_issue_state`  | gh CLI       | Close or reopen an issue                                      |
-| `notion_search`            | Notion API   | Search Notion pages and databases                             |
-| `notion_get_page`          | Notion API   | Get page content (Markdown conversion)                        |
-| `notion_query_database`    | Notion API   | Query database with filters and sorting                       |
-| `notion_create_page`       | Notion API   | Create a new page                                             |
-| `notion_append_blocks`     | Notion API   | Append blocks to a page                                       |
-| `notion_update_page`       | Notion API   | Update page properties                                        |
-| `notion_archive_page`      | Notion API   | Archive (soft-delete) a page                                  |
-| `workspace_search_drive`   | Drive API    | Search files in Google Drive                                  |
-| `workspace_get_doc`        | Drive API    | Get Google Docs content (Markdown)                            |
-| `workspace_get_sheet`      | Sheets API   | Get spreadsheet data                                          |
-| `workspace_get_slides`     | Drive API    | Get slide content (text extraction)                           |
-| `workspace_list_events`    | Calendar API | List calendar events                                          |
-| `workspace_search_gmail`   | Gmail API    | Search emails                                                 |
-| `workspace_update_sheet`   | Sheets API   | Write values to spreadsheet cells                             |
-| `workspace_append_sheet`   | Sheets API   | Append rows to a spreadsheet                                  |
-| `workspace_create_event`   | Calendar API | Create a calendar event                                       |
+| Tool                       | Method            | Description                                                     |
+| -------------------------- | ----------------- | --------------------------------------------------------------- |
+| `project_list_fields`      | GraphQL           | List fields and their options                                   |
+| `project_list_items`       | GraphQL           | List items with status/priority filter (pagination support)     |
+| `project_add_item`         | GraphQL           | Add an Issue or PR to the project                               |
+| `project_move_status`      | GraphQL           | Change item status (alias support: "dev"→"開発中")              |
+| `project_set_priority`     | GraphQL           | Set priority (P0-P4)                                            |
+| `project_sprint_report`    | GraphQL           | Generate sprint report                                          |
+| `project_get_issue`        | GraphQL           | Get issue details (title, body, labels, assignees, milestone)   |
+| `project_create_issue`     | gh CLI            | Create a new issue (supports Japanese title and body)           |
+| `project_edit_issue`       | gh CLI            | Edit issue title and/or body                                    |
+| `project_manage_labels`    | gh CLI            | Add or remove labels on an issue                                |
+| `project_manage_assignees` | gh CLI            | Add or remove assignees on an issue                             |
+| `project_set_issue_state`  | gh CLI            | Close or reopen an issue                                        |
+| `notion_search`            | Notion API        | Search Notion pages and databases                               |
+| `notion_get_page`          | Notion API        | Get page content (Markdown conversion)                          |
+| `notion_query_database`    | Notion API        | Query database with filters and sorting                         |
+| `notion_create_page`       | Notion API        | Create a new page                                               |
+| `notion_append_blocks`     | Notion API        | Append blocks to a page                                         |
+| `notion_update_page`       | Notion API        | Update page properties                                          |
+| `notion_archive_page`      | Notion API        | Archive (soft-delete) a page                                    |
+| `workspace_search_drive`   | Drive API         | Search files in Google Drive                                    |
+| `workspace_get_doc`        | Drive API         | Get Google Docs content (Markdown)                              |
+| `workspace_get_sheet`      | Sheets API        | Get spreadsheet data                                            |
+| `workspace_get_slides`     | Drive API         | Get slide content (text extraction)                             |
+| `workspace_list_events`    | Calendar API      | List calendar events                                            |
+| `workspace_search_gmail`   | Gmail API         | Search emails                                                   |
+| `workspace_update_sheet`   | Sheets API        | Write values to spreadsheet cells                               |
+| `workspace_append_sheet`   | Sheets API        | Append rows to a spreadsheet                                    |
+| `workspace_create_event`   | Calendar API      | Create a calendar event                                         |
+| `project_scan_zombies`     | gh CLI + grep/git | Detect zombie issues (implemented but still Open) with evidence |
+| `project_scan_todos`       | gh CLI + grep     | Scan TODO/FIXME/HACK/XXX markers and propose issue creation     |
+| `project_backlog_report`   | gh CLI + grep/git | Backlog health score (0-100) and comprehensive report           |
 
 **Status aliases (11 mappings)**: Use English shorthand to operate Japanese statuses.
 

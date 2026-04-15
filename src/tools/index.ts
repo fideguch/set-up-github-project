@@ -30,6 +30,7 @@ import { manageAssignees } from './manage-assignees.js';
 import { setIssueState } from './set-issue-state.js';
 import { registerNotionTools } from './notion/index.js';
 import { registerWorkspaceTools } from './workspace/index.js';
+import { registerIssueSyncTools } from './issue-sync/index.js';
 
 /**
  * Register all project management tools on the MCP server.
@@ -167,4 +168,8 @@ export function registerTools(server: McpServer, gql: typeof graphql, gh?: GhRun
 
   registerNotionTools(server);
   registerWorkspaceTools(server);
+
+  // --- Issue Sync tools (zombie detection, TODO scanning, backlog health) ---
+
+  registerIssueSyncTools(server, gql, ghRunner);
 }

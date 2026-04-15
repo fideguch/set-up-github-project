@@ -162,35 +162,39 @@ Claude Desktop の設定 (`~/.claude/settings.json` または MCP 設定):
 
 ### MCP ツール一覧
 
-| ツール                     | 方式         | 説明                                                               |
-| -------------------------- | ------------ | ------------------------------------------------------------------ |
-| `project_list_fields`      | GraphQL      | フィールド・オプション一覧                                         |
-| `project_list_items`       | GraphQL      | アイテム一覧（ステータス/優先度フィルタ対応、ページネーション）    |
-| `project_add_item`         | GraphQL      | Issue/PR をプロジェクトに追加                                      |
-| `project_move_status`      | GraphQL      | ステータス変更（別名対応: "dev"→"開発中"）                         |
-| `project_set_priority`     | GraphQL      | 優先度設定（P0-P4）                                                |
-| `project_sprint_report`    | GraphQL      | Sprint レポート生成                                                |
-| `project_get_issue`        | GraphQL      | Issue 詳細取得（タイトル、本文、ラベル、アサイン、マイルストーン） |
-| `project_edit_issue`       | gh CLI       | Issue のタイトル・本文を編集                                       |
-| `project_manage_labels`    | gh CLI       | Issue のラベル追加・削除                                           |
-| `project_manage_assignees` | gh CLI       | Issue のアサイン追加・削除                                         |
-| `project_set_issue_state`  | gh CLI       | Issue のクローズ・リオープン                                       |
-| `notion_search`            | Notion API   | Notionページ・DB検索                                               |
-| `notion_get_page`          | Notion API   | ページ内容取得（Markdown変換）                                     |
-| `notion_query_database`    | Notion API   | データベースクエリ（フィルタ・ソート）                             |
-| `notion_create_page`       | Notion API   | ページ作成                                                         |
-| `notion_append_blocks`     | Notion API   | ブロック追記                                                       |
-| `workspace_search_drive`   | Drive API    | Driveファイル検索                                                  |
-| `workspace_get_doc`        | Drive API    | Googleドキュメント取得（Markdown）                                 |
-| `workspace_get_sheet`      | Sheets API   | スプレッドシートデータ取得                                         |
-| `workspace_get_slides`     | Drive API    | スライド取得（テキスト）                                           |
-| `workspace_list_events`    | Calendar API | カレンダーイベント取得                                             |
-| `workspace_search_gmail`   | Gmail API    | メール検索                                                         |
-| `workspace_update_sheet`   | Sheets API   | スプレッドシートセル書き込み                                       |
-| `workspace_append_sheet`   | Sheets API   | スプレッドシート行追加                                             |
-| `workspace_create_event`   | Calendar API | カレンダーイベント作成                                             |
-| `notion_update_page`       | Notion API   | ページプロパティ更新                                               |
-| `notion_archive_page`      | Notion API   | ページアーカイブ（削除）                                           |
+| ツール                     | 方式              | 説明                                                                 |
+| -------------------------- | ----------------- | -------------------------------------------------------------------- |
+| `project_list_fields`      | GraphQL           | フィールド・オプション一覧                                           |
+| `project_list_items`       | GraphQL           | アイテム一覧（ステータス/優先度フィルタ対応、ページネーション）      |
+| `project_add_item`         | GraphQL           | Issue/PR をプロジェクトに追加                                        |
+| `project_move_status`      | GraphQL           | ステータス変更（別名対応: "dev"→"開発中"）                           |
+| `project_set_priority`     | GraphQL           | 優先度設定（P0-P4）                                                  |
+| `project_sprint_report`    | GraphQL           | Sprint レポート生成                                                  |
+| `project_get_issue`        | GraphQL           | Issue 詳細取得（タイトル、本文、ラベル、アサイン、マイルストーン）   |
+| `project_create_issue`     | gh CLI            | Issue 新規作成（日本語タイトル・本文対応）                           |
+| `project_edit_issue`       | gh CLI            | Issue のタイトル・本文を編集                                         |
+| `project_manage_labels`    | gh CLI            | Issue のラベル追加・削除                                             |
+| `project_manage_assignees` | gh CLI            | Issue のアサイン追加・削除                                           |
+| `project_set_issue_state`  | gh CLI            | Issue のクローズ・リオープン                                         |
+| `notion_search`            | Notion API        | Notionページ・DB検索                                                 |
+| `notion_get_page`          | Notion API        | ページ内容取得（Markdown変換）                                       |
+| `notion_query_database`    | Notion API        | データベースクエリ（フィルタ・ソート）                               |
+| `notion_create_page`       | Notion API        | ページ作成                                                           |
+| `notion_append_blocks`     | Notion API        | ブロック追記                                                         |
+| `workspace_search_drive`   | Drive API         | Driveファイル検索                                                    |
+| `workspace_get_doc`        | Drive API         | Googleドキュメント取得（Markdown）                                   |
+| `workspace_get_sheet`      | Sheets API        | スプレッドシートデータ取得                                           |
+| `workspace_get_slides`     | Drive API         | スライド取得（テキスト）                                             |
+| `workspace_list_events`    | Calendar API      | カレンダーイベント取得                                               |
+| `workspace_search_gmail`   | Gmail API         | メール検索                                                           |
+| `workspace_update_sheet`   | Sheets API        | スプレッドシートセル書き込み                                         |
+| `workspace_append_sheet`   | Sheets API        | スプレッドシート行追加                                               |
+| `workspace_create_event`   | Calendar API      | カレンダーイベント作成                                               |
+| `notion_update_page`       | Notion API        | ページプロパティ更新                                                 |
+| `notion_archive_page`      | Notion API        | ページアーカイブ（削除）                                             |
+| `project_scan_zombies`     | gh CLI + grep/git | ゾンビIssue検出（実装済みだがOpenのままのIssue候補を証拠付きで提示） |
+| `project_scan_todos`       | gh CLI + grep     | コード内TODO/FIXME/HACK/XXXを収集し、Issue化を提案                   |
+| `project_backlog_report`   | gh CLI + grep/git | バックログ健全性スコア(0-100)とレポート生成                          |
 
 **ステータス別名（11種）**: 英語の省略形で日本語ステータスを操作可能。
 

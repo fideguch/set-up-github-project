@@ -161,6 +161,23 @@ export interface ProjectField {
   readonly options: readonly FieldOption[];
 }
 
+// --- Re-export issue-sync types ---
+
+export type {
+  ZombieClassification,
+  ZombieEvidence,
+  ZombieCandidate,
+  ZombieSummary,
+  ZombieReport,
+  TodoMarker,
+  Priority,
+  TodoEntry,
+  TodoReport,
+  HealthDeduction,
+  BacklogMetrics,
+  BacklogHealthReport,
+} from './issue-sync.js';
+
 export interface SprintReport {
   readonly sprint: string;
   readonly period: { readonly start: string; readonly end: string };
