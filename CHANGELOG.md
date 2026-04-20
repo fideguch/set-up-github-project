@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.0] - 2026-04-21
+
+### Added
+
+- **PM Operator Stance (Last Line of Defense)** section — documents the PM session's self-discipline for parallel Claude Code session operations
+  - 7 principles: MVP value × effort cost judgment, careful baseline, diligent oversight across all sessions, coverage self-check, intervention criteria, communication quality, self-criticism habit
+  - Recommended judgment template (fact / evaluation / action / trade-off)
+  - Anti-pattern list (session report blind trust, ambiguous "either works", prompt bloat, past judgment固執, scope creep, monitoring gaps)
+  - Cross-references to bochi memo (`~/.claude/bochi-data/memos/2026-04-21-pm-last-line-of-defense-stance.md`)
+- README.md top-level summary of PM Operator Stance with link to detailed SKILL.md section
+
+### Context
+
+Origin: 2026-04-21 real operational discovery during Kireinavi commercial project parallel session management. User feedback: "PM must be the strictest last-line-of-defense, tracking everything more diligently than any session." Codified as non-destructive additive documentation to prevent drift between sessions during high-stakes commercial launches.
+
 ## [5.2.0] - 2026-03-29
 
 ### Added

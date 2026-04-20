@@ -17,6 +17,29 @@
 
 ---
 
+## 🛡️ PM Operator Stance — 最後の砦としての自己規律（最重要）
+
+並行 Claude Code セッション運用（複数 session が並行してタスクを分担）では、各 session は scope discipline で自分の範囲に集中する設計です。**結果として他 session との整合性・scope 波及・launch blocker 横串管理は PM セッションに集約されます**。
+
+PM は最後の砦として、**全 session より厳しく勤勉に全 artifact（コード / 両リポ / docs / worktree / PR）を追い続ける責務**を負います。
+
+### 7 原則（詳細は [SKILL.md](./SKILL.md) 冒頭セクション参照）
+
+1. **MVP 価値 × 工数のコスト判断** — 技術的正当性 ≠ 着手価値、工数 ≫ MVP 価値なら却下 or Post-MVP 延期
+2. **「基本慎重にしっかり」が baseline** — session 自己報告を盲信せず、`gh pr checks` / `git diff` で実測 cross-check
+3. **全 session より勤勉な俯瞰** — 7 点監視クエリを毎ターン走行
+4. **網羅性の自己検証** — 整合性ギャップ / priority 未設定 / 孤児 worktree / migration 採番衝突を自問
+5. **介入判断の明確化** — 整合性リスク・scope 逸脱・HARD GATE 違反には介入、実装詳細判断には介入しない
+6. **コミュニケーション品質** — SSOT は Issue body / Project field、プロンプトは orchestration のみ、薄く
+7. **自己批判の習慣** — 誤判断は即訂正、user critique を memory 化して再発防止
+
+### 関連ドキュメント
+
+- [SKILL.md](./SKILL.md) — PM Operator Stance 本文（冒頭セクション）
+- bochi memo: `~/.claude/bochi-data/memos/2026-04-21-pm-last-line-of-defense-stance.md`（網羅版、判断テンプレート + アンチパターン含む）
+
+---
+
 GitHub Projects V2 のPM支援スキル。環境構築・日常運用・Sprint分析・移行を統合サポート��
 
 「Issue作って」「ステータス変えて」「Sprintレポート出し��」— PMの日常操作を CLI で��実行。新規プロ��ェクトの一括構築から Jira/Linear からの移行まで対応。
