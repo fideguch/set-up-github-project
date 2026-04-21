@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.4.0] - 2026-04-22
+
+### Added
+
+- **`references/` directory** — 6 new reference documents supporting the expanded PM Operator Stance chapter:
+  - `references/ai-pm-principles-research.md` — full source paper synthesizing 200+ sources (classical PM canon, reliability engineering, cognitive science, 2024-2026 multi-agent AI research). 9-part structure with 12 principles, 30 anti-patterns, 5 generalized failure cases, 40+ citations.
+  - `references/anti-patterns.md` — 30-row watchlist organized by MAST 2025 failure taxonomy (spec 41.77% / coordination 36.94% / verification 21.30%) + CALM 12-bias categories + process issues.
+  - `references/cynefin-guide.md` — 5-domain discrimination (Clear/Complicated/Complex/Chaotic/Disorder) with 60-second decision tree and orchestration mapping.
+  - `references/premortem-template.md` — 5-minute Klein prospective-hindsight ritual with Devil's Advocate variant for Complex/Chaotic domains.
+  - `references/spec-quality-gate.md` — 5-criterion Boolean rubric (JTBD / numeric AC / invariants / reversibility budget / blast radius) with paste-in template.
+  - `references/self-evaluation-protocol.md` — CALM 12-bias checklist + Reflexion ritual + weekly aggregation protocol.
+- **12-principle PM Operator Stance** replaces prior 7-principle version (v5.3.0). Each principle carries citation + reversal condition + measurement — principles without reversal clauses become dogma. Principles target all three MAST failure layers (specification / coordination / verification).
+- Decision template upgraded with Cynefin tag, outcome link, evidence section, premortem link, and CALM bias audit row.
+- Non-destructive upgrade note mapping old 7 → new 12 principles for teams with prior internalization.
+
+### Changed
+
+- **SKILL.md** "PM Operator Stance" chapter fully rewritten (~380 lines replacing ~70 lines). References new `references/*.md` docs.
+- **README.md** "PM Operator Stance" summary upgraded to reflect 12 principles table and reference doc links. Reframed for general-purpose AI-era PM (not tied to any specific project/team).
+- Chapter scope generalized — removed example session IDs and project-specific launch context; replaced with abstract "parallel AI coding agent" language so the skill applies to any team/product.
+
+### Context
+
+Origin: 2026-04-22. Discovery during sustained parallel Claude Code operations that the v5.3.0 7-principle stance, while directionally correct, lacked (a) literature citations to survive skeptical audit, (b) reversal conditions to avoid dogma formation, and (c) attention to LLM-as-judge bias research published post-2025 (CALM ICLR 2025). User challenge: "自分自身も疑い続け、自分の目で事実を確認する". Synthesized from 200+ sources including Amazon Working Backwards, Google SRE, DORA/Accelerate, Cagan Empowered, Perri Build Trap, Torres Continuous Discovery, Klein Premortem, Snowden Cynefin, Meadows Leverage Points, Taleb Antifragile, Dekker Just Culture, Anthropic Constitutional AI, MAST UC Berkeley 2025, CALM ICLR 2025, Chain-of-Verification, Reflexion, ReAct, Tree of Thoughts. Full paper: `references/ai-pm-principles-research.md`.
+
 ## [5.3.0] - 2026-04-21
 
 ### Added

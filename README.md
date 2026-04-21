@@ -17,26 +17,41 @@
 
 ---
 
-## 🛡️ PM Operator Stance — 最後の砦としての自己規律（最重要）
+## 🛡️ PM Operator Stance — AI 時代の PM 自己規律（12 原則 / v5.4.0）
 
-並行 Claude Code セッション運用（複数 session が並行してタスクを分担）では、各 session は scope discipline で自分の範囲に集中する設計です。**結果として他 session との整合性・scope 波及・launch blocker 横串管理は PM セッションに集約されます**。
+並行 AI コーディングエージェント（Claude Code / Cursor / Devin / Aider 等）を束ねる運用では、PM の役割は「ロードマップ責任者」よりも **最後の砦としての coordinator（インシデントコマンダーに近い）** に寄ります。Multi-Agent System Taxonomy (MAST, UC Berkeley 2025) は multi-agent failures のうち **41.77% が spec 層、36.94% が coordination 層、21.30% が verification 層** で起きると報告しています。古典 PM 正典は必要だが、この 3 層攻略には不十分です。
 
-PM は最後の砦として、**全 session より厳しく勤勉に全 artifact（コード / 両リポ / docs / worktree / PR）を追い続ける責務**を負います。
+12 原則は Amazon / Google SRE / DORA / Cagan / Perri / Torres / Klein / Snowden / Taleb / Meadows / Anthropic / MAST / CALM 等 200+ 文献の統合から導出され、各原則が **(a) 出典 / (b) 適用しない条件 (reversal) / (c) 測定方法** を持ちます。reversal 無き原則はドグマ。
 
-### 7 原則（詳細は [SKILL.md](./SKILL.md) 冒頭セクション参照）
+### 12 原則（要約 — 詳細は [SKILL.md](./SKILL.md) 「PM Operator Stance」章、および [references/](./references/)）
 
-1. **MVP 価値 × 工数のコスト判断** — 技術的正当性 ≠ 着手価値、工数 ≫ MVP 価値なら却下 or Post-MVP 延期
-2. **「基本慎重にしっかり」が baseline** — session 自己報告を盲信せず、`gh pr checks` / `git diff` で実測 cross-check
-3. **全 session より勤勉な俯瞰** — 7 点監視クエリを毎ターン走行
-4. **網羅性の自己検証** — 整合性ギャップ / priority 未設定 / 孤児 worktree / migration 採番衝突を自問
-5. **介入判断の明確化** — 整合性リスク・scope 逸脱・HARD GATE 違反には介入、実装詳細判断には介入しない
-6. **コミュニケーション品質** — SSOT は Issue body / Project field、プロンプトは orchestration のみ、薄く
-7. **自己批判の習慣** — 誤判断は即訂正、user critique を memory 化して再発防止
+| # | 原則 | 主な attack 先 |
+|---|---|---|
+| P1 | Outcomes over outputs | velocity 盲信 |
+| P2 | Cynefin-aware routing | 過剰/過小エンジニアリング |
+| P3 | Chain-of-Verification over self-report trust | MAST verification layer |
+| P4 | Premortem before commit | 盲点リスク |
+| P5 | Blameless postmortem + Just Culture | 再発・second victim |
+| P6 | Working Backwards artifact as SSOT | MAST spec layer / prompt bloat |
+| P7 | Error Budget / SLO-first | over-shipping / freeze discipline |
+| P8 | Trunk-Based + small PRs + fast CI | merge race / long branches |
+| P9 | Leverage-point prioritization | parameter 癒着修正 |
+| P10 | Antifragile posture, convex bets | irreversible risk |
+| P11 | Continuous Discovery (human cadence) | AI が delivery 加速→ discovery 枯渇 |
+| P12 | LNO triage + CALM bias audit | PM 自身の 12 認知バイアス |
 
-### 関連ドキュメント
+### 関連ドキュメント（references/）
 
-- [SKILL.md](./SKILL.md) — PM Operator Stance 本文（冒頭セクション）
-- bochi memo: `~/.claude/bochi-data/memos/2026-04-21-pm-last-line-of-defense-stance.md`（網羅版、判断テンプレート + アンチパターン含む）
+- [`references/ai-pm-principles-research.md`](./references/ai-pm-principles-research.md) — 論文本体（Part 1-9 + 40+ 引用）
+- [`references/anti-patterns.md`](./references/anti-patterns.md) — 30 アンチパターン watchlist（spec/coordination/verification/cognitive/process）
+- [`references/cynefin-guide.md`](./references/cynefin-guide.md) — 5 ドメイン判別と orchestration マッピング
+- [`references/premortem-template.md`](./references/premortem-template.md) — 5 分ルーチン + Devil's Advocate
+- [`references/spec-quality-gate.md`](./references/spec-quality-gate.md) — 5 項目 Boolean ゲート
+- [`references/self-evaluation-protocol.md`](./references/self-evaluation-protocol.md) — CALM 12 バイアス checklist + Reflexion 儀式
+
+### Non-destructive upgrade note
+
+v5.3.0 の 7 原則は **精神的に保存** され、12 原則に包摂されています。7 原則を既に内面化していれば、12 原則は同じ理念に citation / reversal / measurement を追加したもので、リセットではありません。詳細は [SKILL.md](./SKILL.md) の「Non-destructive upgrade note」参照。
 
 ---
 
