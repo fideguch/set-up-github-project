@@ -1,10 +1,12 @@
 # My PM Tools
 
-[日本語](README.md)
+[日本語](README.md) · v5.4.0 — AI-era PM Operator Stance onboard
 
 A PM assistant skill for GitHub Projects V2. Covers environment setup, daily operations, Sprint analytics, and migration — all in one.
 
 "Create an issue", "Change status", "Sprint report" — execute PM daily tasks instantly via CLI. From full project setup to Jira/Linear migration.
+
+**31 MCP tools** / **9 shell scripts** / **536 tests** / **6 references docs** (12 principles + 30 anti-patterns + Cynefin + Premortem + Spec Quality Gate + CALM self-evaluation)
 
 ## Product Vision
 
@@ -12,12 +14,52 @@ A PM assistant skill for GitHub Projects V2. Covers environment setup, daily ope
 
 | Field           | Definition                                                                                                                        |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Target User** | PMs / Tech Leads in solo or small teams (1-10 people)                                                                             |
+| **Target User** | PMs / Tech Leads in solo or small teams (1-10 people). Especially PMs orchestrating parallel AI coding agents.                   |
 | **Core Value**  | Absorbs GraphQL API + Notion API + Google APIs complexity into CLI. Bidirectional document, spreadsheet, and calendar integration |
-| **Scope**       | Mode A(Setup), Mode B(Daily Ops), Mode C(Analytics), Migration, Workspace Bridge(Read+Write)                                      |
+| **Scope**       | Mode A(Setup), Mode B(Daily Ops), Mode C(Analytics), Migration, Workspace Bridge(Read+Write), PM Operator Stance                  |
 | **Non-Goals**   | GUI, multi-Org support, self-built Slack integration, full Jira/Linear replacement, Gmail sending                                 |
 
 **Suite position**: `requirements_designer → speckit-bridge → **my_pm_tools** → pm-data-analysis`. The execution management layer after specs are finalized.
+
+---
+
+## 🛡️ PM Operator Stance — 12 Principles for AI-Era PMs (v5.4.0)
+
+When orchestrating parallel AI coding agents (Claude Code / Cursor / Devin / Aider, etc.), the PM role shifts from "roadmap owner" to **last-line-of-defense coordinator** — closer to an incident commander than a traditional PM. The Multi-Agent System Taxonomy (MAST, UC Berkeley 2025) reports that of multi-agent failures, **41.77% occur in the specification layer, 36.94% in coordination, and 21.30% in verification**. Classical PM canon is necessary but insufficient against these three failure modes.
+
+The 12 principles are synthesized from 200+ sources including Amazon, Google SRE, DORA, Cagan, Perri, Torres, Klein, Snowden, Taleb, Meadows, Anthropic, MAST, and CALM. Each principle carries **(a) citation, (b) reversal condition (when it does NOT apply), and (c) measurement method**. A principle without a reversal clause becomes dogma.
+
+### 12 Principles (summary — see [SKILL.md](./SKILL.md) "PM Operator Stance" chapter and [references/](./references/) for full detail)
+
+| # | Principle | Primary attack surface |
+|---|---|---|
+| P1 | Outcomes over outputs | Velocity blind-trust |
+| P2 | Cynefin-aware routing | Over/under-engineering |
+| P3 | Chain-of-Verification over self-report trust | MAST verification layer |
+| P4 | Premortem before commit | Blind-spot risks |
+| P5 | Blameless postmortem + Just Culture | Recurrence / second victim |
+| P6 | Working Backwards artifact as SSOT | MAST spec layer / prompt bloat |
+| P7 | Error Budget / SLO-first | Over-shipping / freeze discipline |
+| P8 | Trunk-Based + small PRs + fast CI | Merge race / long branches |
+| P9 | Leverage-point prioritization | Parameter-level patching |
+| P10 | Antifragile posture, convex bets | Irreversible risk |
+| P11 | Continuous Discovery (human cadence) | Discovery starvation under AI-accelerated delivery |
+| P12 | LNO triage + CALM bias audit | PM's own 12 cognitive biases |
+
+### Reference documents (references/)
+
+- [`references/ai-pm-principles-research.md`](./references/ai-pm-principles-research.md) — full paper (Parts 1-9 + 40+ citations)
+- [`references/anti-patterns.md`](./references/anti-patterns.md) — 30-row watchlist (spec / coordination / verification / cognitive / process)
+- [`references/cynefin-guide.md`](./references/cynefin-guide.md) — 5-domain discrimination + orchestration mapping
+- [`references/premortem-template.md`](./references/premortem-template.md) — 5-minute ritual + Devil's Advocate variant
+- [`references/spec-quality-gate.md`](./references/spec-quality-gate.md) — 5-criterion Boolean rubric
+- [`references/self-evaluation-protocol.md`](./references/self-evaluation-protocol.md) — CALM 12-bias checklist + Reflexion ritual
+
+### Non-destructive upgrade note
+
+The v5.3.0 7-principle stance is **preserved in spirit** and subsumed by the 12 principles. If your team has already internalized the 7-principle version, the 12 principles add citation / reversal / measurement to the same ideas — not a reset. See [SKILL.md](./SKILL.md) "Non-destructive upgrade note" for the old→new mapping.
+
+---
 
 ## 3 Modes
 

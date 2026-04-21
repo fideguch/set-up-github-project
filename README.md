@@ -1,6 +1,10 @@
 # My PM Tools
 
-[English](README.en.md)
+[English](README.en.md) · v5.4.0 — AI 時代の PM Operator Stance 搭載
+
+GitHub Projects V2 の PM 支援スキル。環境構築・日常運用・Sprint 分析・移行を統合サポート。「Issue を作成して」「ステータスを変更」「Sprint レポート出して」等の自然言語で gh CLI + GraphQL + Notion + Google Workspace を束ねて実行します。
+
+**31 MCP ツール** / **9 shell scripts** / **536 tests** / **6 references docs** (12 principles + 30 anti-patterns + Cynefin + Premortem + Spec Quality Gate + CALM self-evaluation)
 
 ## Product Vision
 
@@ -8,9 +12,9 @@
 
 | Field           | Definition                                                                                                                      |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **Target User** | 個人〜小規模チーム（1-10人）の PM / テックリード                                                                                |
+| **Target User** | 個人〜小規模チーム（1-10人）の PM / テックリード。特に並行 AI コーディングエージェントを束ねる PM。                              |
 | **Core Value**  | GraphQL API + Notion API + Google APIs の複雑さを吸収し、CLI で完結。外部ドキュメント・スプレッドシート・カレンダーの双方向連携 |
-| **Scope**       | Mode A(Setup), Mode B(Daily Ops), Mode C(Analytics), Migration, Workspace Bridge(Read+Write)                                    |
+| **Scope**       | Mode A(Setup), Mode B(Daily Ops), Mode C(Analytics), Migration, Workspace Bridge(Read+Write), PM Operator Stance                |
 | **Non-Goals**   | GUI構築, マルチOrg対応, Slack連携自前実装, Jira/Linear完全代替, Gmail送信                                                       |
 
 **Suite内の位置づけ**: `requirements_designer → speckit-bridge → **my_pm_tools** → pm-data-analysis`。仕様が固まった後の実行管理レイヤー。
@@ -54,10 +58,6 @@
 v5.3.0 の 7 原則は **精神的に保存** され、12 原則に包摂されています。7 原則を既に内面化していれば、12 原則は同じ理念に citation / reversal / measurement を追加したもので、リセットではありません。詳細は [SKILL.md](./SKILL.md) の「Non-destructive upgrade note」参照。
 
 ---
-
-GitHub Projects V2 のPM支援スキル。環境構築・日常運用・Sprint分析・移行を統合サポート��
-
-「Issue作って」「ステータス変えて」「Sprintレポート出し��」— PMの日常操作を CLI で��実行。新規プロ��ェクトの一括構築から Jira/Linear からの移行まで対応。
 
 ## 3つのモード
 
