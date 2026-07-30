@@ -40,7 +40,7 @@ Origin: 2026-04-22. Discovery during sustained parallel Claude Code operations t
 
 ### Context
 
-Origin: 2026-04-21 real operational discovery during Kireinavi commercial project parallel session management. User feedback: "PM must be the strictest last-line-of-defense, tracking everything more diligently than any session." Codified as non-destructive additive documentation to prevent drift between sessions during high-stakes commercial launches.
+Origin: 2026-04-21 real operational discovery during a commercial project's parallel session management. User feedback: "PM must be the strictest last-line-of-defense, tracking everything more diligently than any session." Codified as non-destructive additive documentation to prevent drift between sessions during high-stakes commercial launches.
 
 ## [5.2.0] - 2026-03-29
 
